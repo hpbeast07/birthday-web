@@ -1120,7 +1120,7 @@ Always stay the same graceful & awesome soul you are. Happy Birthday! 💖✨`,
         <div class="polaroid-content">
           <p class="polaroid-caption" data-photo-id="${photo.id}">${photo.caption || 'Pyaara sa moment ✨'}</p>
           <div class="polaroid-meta">
-            <span class="polaroid-badge-tag">${photo.badge || 'Dosti Moment 🌸'}</span>
+            <span class="polaroid-badge-tag btn-edit-badge" data-id="${photo.id}" title="Tag badalne ke liye click kijiye (Crime Partner, Bestie etc.)">${photo.badge || 'Dosti Moment 🌸'} <span class="badge-edit-icon" style="font-size: 0.68rem; opacity: 0.75;">✏️</span></span>
             <div class="polaroid-actions">
               <button class="btn-like-heart" data-id="${photo.id}" title="Yeh photo pasand aayi">
                 ${(photo.likes && photo.likes > 0) ? '💖' : '🤍'} <span class="like-count" style="font-size: 0.75rem;">${photo.likes || 0}</span>
@@ -1151,16 +1151,24 @@ Always stay the same graceful & awesome soul you are. Happy Birthday! 💖✨`,
         setTimeout(() => likeBtn.classList.remove('liked'), 400);
       });
 
-      // Edit caption
-      const editCapBtn = card.querySelector('.btn-edit-caption');
-      editCapBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        openEditSimpleModal('Photo Ka Caption Badliye', photo.caption, async (newCap) => {
-          photo.caption = newCap;
-          await savePhoto(photo);
-          await renderGallery();
+      // Edit Tag by clicking badge directly
+      const badgeTag = card.querySelector('.polaroid-badge-tag');
+      if (badgeTag) {
+        badgeTag.addEventListener('click', (e) => {
+          e.stopPropagation();
+          if (document.body.classList.contains('view-mode')) return;
+          openEditPhotoModal(photo, 'tag');
         });
-      });
+      }
+
+      // Edit caption & tag via pencil button
+      const editCapBtn = card.querySelector('.btn-edit-caption');
+      if (editCapBtn) {
+        editCapBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          openEditPhotoModal(photo, 'caption');
+        });
+      }
 
       // Replace photo
       const replaceBtn = card.querySelector('.btn-replace-photo');
@@ -1294,8 +1302,16 @@ Always stay the same graceful & awesome soul you are. Happy Birthday! 💖✨`,
         previewEl.innerHTML = `
           <button class="btn-remove-preview" title="Hatai">✕</button>
           <img src="${item.src}" class="upload-preview-img" alt="Preview">
+          <input type="text" class="upload-badge-input" value="${item.badge || 'Bestie Yaadein 💖'}" placeholder="Tag: e.g. Crime Partner 🎀">
           <input type="text" class="upload-caption-input" value="${item.caption}" placeholder="Pyaara caption likhiye...">
         `;
+
+        const badgeInput = previewEl.querySelector('.upload-badge-input');
+        if (badgeInput) {
+          badgeInput.addEventListener('input', (e) => {
+            item.badge = e.target.value;
+          });
+        }
 
         const capInput = previewEl.querySelector('.upload-caption-input');
         capInput.addEventListener('input', (e) => {
@@ -1838,6 +1854,58 @@ Always stay the same graceful & awesome soul you are. Happy Birthday! 💖✨`,
 
     closeBtn.addEventListener('click', close);
     modal.addEventListener('click', modalClick);
+  }
+
+
+  function openEditPhotoModal(photo, focusField = 'tag') {
+    const modal = document.getElementById('modal-edit-photo');
+    if (!modal) return;
+
+    const tagInput = document.getElementById('edit-photo-tag');
+    const capInput = document.getElementById('edit-photo-caption');
+    const saveBtn = document.getElementById('btn-save-photo-details');
+    const closeBtn = document.getElementById('btn-close-photo-modal');
+
+    tagInput.value = photo.badge || 'Bestie Masti ✨';
+    capInput.value = photo.caption || '';
+
+    modal.classList.add('active');
+
+    if (focusField === 'caption') {
+      setTimeout(() => capInput.focus(), 80);
+    } else {
+      setTimeout(() => tagInput.focus(), 80);
+    }
+
+    // Connect suggestion chips
+    const chips = modal.querySelectorAll('.tag-chip');
+    chips.forEach(chip => {
+      chip.onclick = () => {
+        tagInput.value = chip.getAttribute('data-tag');
+        tagInput.focus();
+      };
+    });
+
+    function cleanup() {
+      modal.classList.remove('active');
+      saveBtn.onclick = null;
+      closeBtn.onclick = null;
+      modal.onclick = null;
+    }
+
+    closeBtn.onclick = cleanup;
+    modal.onclick = (e) => {
+      if (e.target === modal) cleanup();
+    };
+
+    saveBtn.onclick = async () => {
+      photo.badge = tagInput.value.trim() || 'Bestie Masti ✨';
+      photo.caption = capInput.value.trim() || 'Pyaara moment ✨';
+      await savePhoto(photo);
+      await renderGallery();
+      launchConfettiBurst(25);
+      cleanup();
+    };
   }
 
   function openEditSimpleModal(title, currentValue, onSave) {

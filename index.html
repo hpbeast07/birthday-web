@@ -639,6 +639,40 @@
     </div>
   </div>
 
+  <!-- Modal: Edit Photo Tag & Caption -->
+  <div id="modal-edit-photo" class="modal-overlay">
+    <div class="modal-dialog">
+      <button id="btn-close-photo-modal" class="modal-close-btn">&times;</button>
+      <div class="modal-header">
+        <h3 class="modal-title">Photo Memory Edit Kijiye 📸</h3>
+        <p class="modal-subtitle">Tag (jaise Crime Partner, Bestie) aur Caption dono customize kijiye.</p>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="edit-photo-tag">Photo Tag / Badge (Crime Partner, Bestie, etc.)</label>
+        <input type="text" id="edit-photo-tag" class="form-control" placeholder="e.g. Crime Partner 🎀">
+        <div class="tag-suggestions" style="margin-top: 8px; display: flex; gap: 6px; flex-wrap: wrap;">
+          <span style="font-size: 0.8rem; color: #888; align-self: center;">Quick pick:</span>
+          <button type="button" class="tag-chip" data-tag="Crime Partner 🎀">Crime Partner 🎀</button>
+          <button type="button" class="tag-chip" data-tag="Bestie Masti ✨">Bestie Masti ✨</button>
+          <button type="button" class="tag-chip" data-tag="Chai & Gup-Shup 🌸">Chai &amp; Gup-Shup 🌸</button>
+          <button type="button" class="tag-chip" data-tag="Night Talks 🌙">Night Talks 🌙</button>
+          <button type="button" class="tag-chip" data-tag="Pure Fun 🌅">Pure Fun 🌅</button>
+          <button type="button" class="tag-chip" data-tag="Dosti Vibes 🌷">Dosti Vibes 🌷</button>
+        </div>
+      </div>
+
+      <div class="form-group" style="margin-top: 14px;">
+        <label class="form-label" for="edit-photo-caption">Caption</label>
+        <textarea id="edit-photo-caption" class="form-control" style="min-height: 85px;" placeholder="Pyaara sa memory caption likhiye..."></textarea>
+      </div>
+
+      <div class="modal-actions">
+        <button id="btn-save-photo-details" class="btn-upload-photos" style="padding: 10px 24px;">Save Changes ✨</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Modal 7: Edit Simple Text Modal -->
   <div id="modal-edit-simple" class="modal-overlay">
     <div class="modal-dialog">

@@ -2198,3 +2198,70 @@ textarea.form-control {
     max-width: 90px;
   }
 }
+
+
+/* POLAROID BADGE TAG & CHIPS (CRIME PARTNER, BESTIE, ETC.) */
+.polaroid-badge-tag {
+  background: linear-gradient(135deg, rgba(255, 235, 240, 0.95), rgba(243, 232, 255, 0.95));
+  border: 1px dashed var(--color-pink-light);
+  color: var(--color-pink-deep);
+  font-size: 0.76rem;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  letter-spacing: 0.2px;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+
+body:not(.view-mode) .polaroid-badge-tag {
+  cursor: pointer;
+}
+
+body:not(.view-mode) .polaroid-badge-tag:hover {
+  background: var(--color-pink-softest);
+  border-color: var(--color-pink-deep);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(220, 100, 140, 0.15);
+}
+
+body.view-mode .badge-edit-icon {
+  display: none !important;
+}
+
+body.view-mode .polaroid-badge-tag {
+  cursor: default !important;
+  pointer-events: none !important;
+}
+
+.tag-chip {
+  cursor: pointer;
+  background: #FFF0F5;
+  border: 1px dashed #FFB6C1;
+  border-radius: 12px;
+  padding: 3px 10px;
+  font-size: 0.78rem;
+  color: #D84A75;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.tag-chip:hover {
+  background: #FFE4E1;
+  border-color: #D84A75;
+  transform: scale(1.05);
+}
+
+.upload-badge-input {
+  width: 100%;
+  padding: 5px 8px;
+  font-size: 0.8rem;
+  border: 1px solid var(--color-pink-light);
+  border-radius: var(--radius-sm);
+  background: #FFFDF9;
+  margin-top: 4px;
+  font-family: inherit;
+}
