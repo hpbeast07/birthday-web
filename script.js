@@ -1394,12 +1394,24 @@ Always stay the same graceful & awesome soul you are. Happy Birthday! 💖✨`,
         <p class="reason-desc">${item.desc}</p>
         <div class="reason-footer">
           <button class="btn-card-mini btn-edit-reason" data-id="${item.id}" title="Yeh reason edit kijiye">✏️</button>
+          <button class="btn-card-mini btn-delete btn-delete-reason" data-id="${item.id}" title="Yeh reason delete kijiye">🗑️</button>
         </div>
       `;
 
       const editBtn = card.querySelector('.btn-edit-reason');
       editBtn.addEventListener('click', () => {
         openEditReasonModal(item);
+      });
+
+      const delBtn = card.querySelector('.btn-delete-reason');
+      delBtn.addEventListener('click', async () => {
+        if (confirm('Kya sach me yeh reason delete karna hai? 🗑️')) {
+          const reasons = await getReasonsData();
+          const filtered = reasons.filter(r => r.id !== item.id);
+          await saveReasonsData(filtered);
+          await renderReasons();
+          launchConfettiBurst(20);
+        }
       });
 
       container.appendChild(card);
