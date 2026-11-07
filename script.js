@@ -1382,6 +1382,13 @@ Always stay the same graceful & awesome soul you are. Happy Birthday! 💖✨`,
     const reasons = await getReasonsData();
     container.innerHTML = '';
 
+    // Sort reasons by number so changing the number reorders them properly!
+    reasons.sort((a, b) => {
+      const numA = parseInt(a.num, 10) || 0;
+      const numB = parseInt(b.num, 10) || 0;
+      return numA - numB;
+    });
+
     reasons.forEach(item => {
       const card = document.createElement('div');
       card.className = 'reason-card';
@@ -1419,56 +1426,101 @@ Always stay the same graceful & awesome soul you are. Happy Birthday! 💖✨`,
   }
 
   function setupReasonsEditor() {
-    const editAllBtn = document.getElementById('btn-open-edit-reasons');
-    if (editAllBtn) {
-      editAllBtn.addEventListener('click', async () => {
+    const addBtn = document.getElementById('btn-add-reason');
+    if (addBtn) {
+      addBtn.addEventListener('click', async () => {
         const reasons = await getReasonsData();
-        openEditReasonModal(reasons[0]);
+        const nextNum = reasons.length + 1;
+        openEditReasonModal({ num: String(nextNum), emoji: '💖', title: '', desc: '' }, true);
       });
     }
+
+
   }
 
-  function openEditReasonModal(reasonItem) {
+  function openEditReasonModal(reasonItem, isNew = false) {
     const modal = document.getElementById('modal-edit-reason');
     if (!modal) return;
 
+    const numInput   = document.getElementById('edit-reason-num');
     const titleInput = document.getElementById('edit-reason-title');
     const emojiInput = document.getElementById('edit-reason-emoji');
-    const descInput = document.getElementById('edit-reason-desc');
-    const saveBtn = document.getElementById('btn-save-reason');
-    const closeBtn = document.getElementById('btn-close-reason-modal');
+    const descInput  = document.getElementById('edit-reason-desc');
+    const saveBtn    = document.getElementById('btn-save-reason');
+    const closeBtn   = document.getElementById('btn-close-reason-modal');
+    const modalTitle = modal.querySelector('.modal-title');
 
-    titleInput.value = reasonItem.title;
-    emojiInput.value = reasonItem.emoji;
-    descInput.value = reasonItem.desc;
+    if (modalTitle) {
+      modalTitle.textContent = isNew ? 'Naya Reason Jodein ✨' : 'Reason Edit Kijiye 💖';
+    }
+
+    if (isNew || !reasonItem) {
+      numInput.value   = (reasonItem && reasonItem.num) ? reasonItem.num : '';
+      titleInput.value = '';
+      emojiInput.value = '💖';
+      descInput.value  = '';
+    } else {
+      numInput.value   = reasonItem.num !== undefined ? reasonItem.num : '';
+      titleInput.value = reasonItem.title || '';
+      emojiInput.value = reasonItem.emoji || '✨';
+      descInput.value  = reasonItem.desc  || '';
+    }
 
     modal.classList.add('active');
 
-    async function saveHandler() {
-      reasonItem.title = titleInput.value.trim() || reasonItem.title;
-      reasonItem.emoji = emojiInput.value.trim() || reasonItem.emoji;
-      reasonItem.desc = descInput.value.trim() || reasonItem.desc;
-
-      const reasons = await getReasonsData();
-      const idx = reasons.findIndex(r => r.id === reasonItem.id);
-      if (idx !== -1) {
-        reasons[idx] = reasonItem;
-        await saveReasonsData(reasons);
-        await renderReasons();
-        launchConfettiBurst(30);
-      }
-
-      cleanup();
-    }
-
     function cleanup() {
       modal.classList.remove('active');
-      saveBtn.removeEventListener('click', saveHandler);
-      closeBtn.removeEventListener('click', cleanup);
+      saveBtn.onclick = null;
+      closeBtn.onclick = null;
+      modal.onclick = null;
     }
 
-    saveBtn.addEventListener('click', saveHandler);
-    closeBtn.addEventListener('click', cleanup);
+    closeBtn.onclick = cleanup;
+    modal.onclick = (e) => {
+      if (e.target === modal) cleanup();
+    };
+
+    saveBtn.onclick = async () => {
+      const reasons = await getReasonsData();
+      const rawNum = numInput.value.trim();
+      const numVal = rawNum || (reasonItem ? reasonItem.num : String(reasons.length + 1));
+      const emojiVal = emojiInput.value.trim() || '✨';
+      const titleVal = titleInput.value.trim() || 'Khaas Baat';
+      const descVal  = descInput.value.trim() || 'Aap sach me bohot pyaari aur anmol dost hain!';
+
+      if (isNew || !reasonItem || !reasonItem.id) {
+        const newReason = {
+          id: 'reason_' + Date.now(),
+          num: numVal,
+          emoji: emojiVal,
+          title: titleVal,
+          desc: descVal
+        };
+        reasons.push(newReason);
+      } else {
+        reasonItem.num   = numVal;
+        reasonItem.emoji = emojiVal;
+        reasonItem.title = titleVal;
+        reasonItem.desc  = descVal;
+
+        const idx = reasons.findIndex(r => r.id === reasonItem.id);
+        if (idx !== -1) {
+          reasons[idx] = reasonItem;
+        }
+      }
+
+      // Automatically sort reasons by number
+      reasons.sort((a, b) => {
+        const numA = parseInt(a.num, 10) || 0;
+        const numB = parseInt(b.num, 10) || 0;
+        return numA - numB;
+      });
+
+      await saveReasonsData(reasons);
+      await renderReasons();
+      launchConfettiBurst(30);
+      cleanup();
+    };
   }
 
   // ==========================================
