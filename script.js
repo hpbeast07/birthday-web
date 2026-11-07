@@ -451,41 +451,82 @@ Always stay the same graceful & awesome soul you are. Happy Birthday! 💖✨`,
   }
 
   async function getGifData() {
-    if (supabase) {
-      try {
-        const { data } = await supabase.from('birthday_settings').select('value').eq('key', 'gif_config').single();
-        if (data && data.value) return data.value;
-      } catch (e) {}
-    }
-    return {
-      src: localStorage.getItem(STORAGE_KEYS.CUSTOM_GIF) || DEFAULT_GIF_URL,
-      caption: localStorage.getItem(STORAGE_KEYS.GIF_CAPTION) || DEFAULT_GIF_CAPTION
-    };
-  }
-  async function saveGifData(src, caption) {
-    if (src) localStorage.setItem(STORAGE_KEYS.CUSTOM_GIF, src);
-    if (caption) localStorage.setItem(STORAGE_KEYS.GIF_CAPTION, caption);
+    let src = localStorage.getItem(STORAGE_KEYS.CUSTOM_GIF) || DEFAULT_GIF_URL;
+    let caption = localStorage.getItem(STORAGE_KEYS.GIF_CAPTION) || DEFAULT_GIF_CAPTION;
 
     if (supabase) {
       try {
-        let finalSrc = src;
-        if (src && src.startsWith('data:image')) {
-          const blob = dataURLtoBlob(src);
-          const fileName = `gif_${Date.now()}_${Math.random().toString(36).substr(2, 6)}.gif`;
-          const { data: upData, error: upErr } = await supabase.storage.from(SUPABASE_CONFIG.bucketName).upload(fileName, blob, {
-            contentType: 'image/gif',
-            upsert: true
-          });
-          if (!upErr && upData) {
-            const { data: pubData } = supabase.storage.from(SUPABASE_CONFIG.bucketName).getPublicUrl(fileName);
-            if (pubData) finalSrc = pubData.publicUrl;
+        const { data, error } = await supabase.from('birthday_settings').select('value').eq('key', 'gif_config').single();
+        if (!error && data && data.value) {
+          if (data.value.src && typeof data.value.src === 'string' && data.value.src.trim() !== '') {
+            src = data.value.src;
+            localStorage.setItem(STORAGE_KEYS.CUSTOM_GIF, src);
+          }
+          if (data.value.caption && typeof data.value.caption === 'string' && data.value.caption.trim() !== '') {
+            caption = data.value.caption;
+            localStorage.setItem(STORAGE_KEYS.GIF_CAPTION, caption);
           }
         }
+      } catch (e) {
+        console.warn('Error reading gif_config from Supabase:', e);
+      }
+    }
+    return {
+      src: src || DEFAULT_GIF_URL,
+      caption: caption || DEFAULT_GIF_CAPTION
+    };
+  }
+
+  async function saveGifData(newSrc, newCaption) {
+    // Current data prapt kijiye taaki jo cheez change nahi hui wo gayab na ho
+    const current = await getGifData();
+
+    const finalSrc = (newSrc !== null && newSrc !== undefined && typeof newSrc === 'string' && newSrc.trim() !== '') 
+                     ? newSrc.trim() 
+                     : current.src;
+
+    const finalCaption = (newCaption !== null && newCaption !== undefined && typeof newCaption === 'string' && newCaption.trim() !== '') 
+                         ? newCaption.trim() 
+                         : current.caption;
+
+    // LocalStorage me save kijiye
+    if (finalSrc) localStorage.setItem(STORAGE_KEYS.CUSTOM_GIF, finalSrc);
+    if (finalCaption) localStorage.setItem(STORAGE_KEYS.GIF_CAPTION, finalCaption);
+
+    // Supabase me cloud sync kijiye
+    if (supabase) {
+      try {
+        let cloudSrc = finalSrc;
+        // Agar naya base64 file upload hua hai, toh storage bucket me upload kijiye
+        if (newSrc && typeof newSrc === 'string' && newSrc.startsWith('data:image')) {
+          try {
+            const blob = dataURLtoBlob(newSrc);
+            const isGif = newSrc.includes('image/gif');
+            const ext = isGif ? 'gif' : 'png';
+            const fileName = `gif_${Date.now()}_${Math.random().toString(36).substr(2, 6)}.${ext}`;
+            const { data: upData, error: upErr } = await supabase.storage.from(SUPABASE_CONFIG.bucketName).upload(fileName, blob, {
+              contentType: isGif ? 'image/gif' : 'image/png',
+              upsert: true
+            });
+            if (!upErr && upData) {
+              const { data: pubData } = supabase.storage.from(SUPABASE_CONFIG.bucketName).getPublicUrl(fileName);
+              if (pubData && pubData.publicUrl) {
+                cloudSrc = pubData.publicUrl;
+                localStorage.setItem(STORAGE_KEYS.CUSTOM_GIF, cloudSrc);
+              }
+            }
+          } catch (storageErr) {
+            console.warn('Supabase storage upload error for GIF, saving direct src:', storageErr);
+          }
+        }
+
         await supabase.from('birthday_settings').upsert({
           key: 'gif_config',
-          value: { src: finalSrc, caption }
+          value: { src: cloudSrc, caption: finalCaption }
         });
-      } catch (e) {}
+      } catch (err) {
+        console.warn('Could not sync GIF to Supabase:', err);
+      }
     }
   }
 
@@ -966,17 +1007,21 @@ Always stay the same graceful & awesome soul you are. Happy Birthday! 💖✨`,
     const closeGifModal = document.getElementById('btn-close-gif-modal');
     const gifFileInput = document.getElementById('gif-file-input');
     const gifUrlInput = document.getElementById('gif-url-input');
+    const modalCaptionInput = document.getElementById('modal-gif-caption-input');
     const saveGifUrlBtn = document.getElementById('btn-save-gif-url');
 
     async function renderGif() {
       const data = await getGifData();
-      if (gifImg) gifImg.src = data.src;
-      if (gifCaption) gifCaption.innerText = data.caption;
+      if (gifImg && data.src) gifImg.src = data.src;
+      if (gifCaption && data.caption) gifCaption.innerText = data.caption;
+      if (modalCaptionInput && data.caption) modalCaptionInput.value = data.caption;
     }
     await renderGif();
 
     if (changeGifBtn && modalGif) {
-      changeGifBtn.addEventListener('click', () => {
+      changeGifBtn.addEventListener('click', async () => {
+        const data = await getGifData();
+        if (modalCaptionInput) modalCaptionInput.value = data.caption || '';
         modalGif.classList.add('active');
       });
     }
@@ -994,7 +1039,8 @@ Always stay the same graceful & awesome soul you are. Happy Birthday! 💖✨`,
 
         const reader = new FileReader();
         reader.onload = async (ev) => {
-          await saveGifData(ev.target.result, null);
+          const cap = modalCaptionInput ? modalCaptionInput.value.trim() : null;
+          await saveGifData(ev.target.result, cap);
           await renderGif();
           modalGif.classList.remove('active');
           launchConfettiBurst(50);
@@ -1004,17 +1050,18 @@ Always stay the same graceful & awesome soul you are. Happy Birthday! 💖✨`,
       });
     }
 
-    // Set GIF from URL
-    if (saveGifUrlBtn && gifUrlInput) {
+    // Set GIF from URL and/or update Caption
+    if (saveGifUrlBtn) {
       saveGifUrlBtn.addEventListener('click', async () => {
-        const url = gifUrlInput.value.trim();
-        if (!url) {
-          alert('Pehle koi GIF URL daliye ya image select kijiye! 🖼️');
+        const url = gifUrlInput ? gifUrlInput.value.trim() : '';
+        const cap = modalCaptionInput ? modalCaptionInput.value.trim() : '';
+        if (!url && !cap) {
+          alert('Pehle koi GIF URL daliye ya caption likhiye! 🖼️');
           return;
         }
-        await saveGifData(url, null);
+        await saveGifData(url || null, cap || null);
         await renderGif();
-        gifUrlInput.value = '';
+        if (gifUrlInput) gifUrlInput.value = '';
         modalGif.classList.remove('active');
         launchConfettiBurst(50);
         playSparkleSound();
@@ -1023,8 +1070,9 @@ Always stay the same graceful & awesome soul you are. Happy Birthday! 💖✨`,
 
     // Edit GIF Caption
     if (editGifCaptionBtn && gifCaption) {
-      editGifCaptionBtn.addEventListener('click', () => {
-        openEditSimpleModal('GIF Ka Caption Badliye', gifCaption.innerText, async (newCap) => {
+      editGifCaptionBtn.addEventListener('click', async () => {
+        const currentData = await getGifData();
+        openEditSimpleModal('GIF Ka Caption Badliye', currentData.caption || gifCaption.innerText, async (newCap) => {
           await saveGifData(null, newCap);
           await renderGif();
           launchConfettiBurst(30);
