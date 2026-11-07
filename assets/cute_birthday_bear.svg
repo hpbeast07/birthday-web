@@ -1,0 +1,124 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 450 400" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bgPastel" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFF0F5"/>
+      <stop offset="50%" stop-color="#FFE4EC"/>
+      <stop offset="100%" stop-color="#F5E6FA"/>
+    </linearGradient>
+    <filter id="shadowGif">
+      <feDropShadow dx="0" dy="6" stdDeviation="6" flood-color="#D94876" flood-opacity="0.2"/>
+    </filter>
+    <style>
+      @keyframes dance {
+        0%, 100% { transform: translateY(0px) rotate(0deg); }
+        25% { transform: translateY(-12px) rotate(-3deg); }
+        75% { transform: translateY(-6px) rotate(3deg); }
+      }
+      @keyframes wiggleHat {
+        0%, 100% { transform: rotate(0deg); }
+        50% { transform: rotate(8deg); }
+      }
+      @keyframes popHeart {
+        0%, 100% { transform: scale(1); opacity: 0.8; }
+        50% { transform: scale(1.3) translateY(-8px); opacity: 1; }
+      }
+      @keyframes confettiTwinkle {
+        0%, 100% { opacity: 0.3; transform: scale(0.8); }
+        50% { opacity: 1; transform: scale(1.2); }
+      }
+      .bear-body {
+        animation: dance 2.2s infinite ease-in-out;
+        transform-origin: 225px 250px;
+      }
+      .party-hat {
+        animation: wiggleHat 1.5s infinite ease-in-out;
+        transform-origin: 225px 120px;
+      }
+      .heart-anim-1 { animation: popHeart 2s infinite ease-in-out; }
+      .heart-anim-2 { animation: popHeart 2.4s infinite ease-in-out 0.6s; }
+      .confetti-sparkle { animation: confettiTwinkle 1.8s infinite ease-in-out; }
+    </style>
+  </defs>
+
+  <rect width="450" height="400" fill="url(#bgPastel)" rx="20"/>
+
+  <!-- Background Animated Sparkles / Confetti -->
+  <circle cx="60" cy="80" r="8" fill="#FF8FAB" class="confetti-sparkle"/>
+  <circle cx="390" cy="110" r="10" fill="#FCD34D" class="confetti-sparkle" style="animation-delay: 0.4s;"/>
+  <circle cx="85" cy="300" r="7" fill="#C9A9E8" class="confetti-sparkle" style="animation-delay: 0.9s;"/>
+  <circle cx="370" cy="280" r="9" fill="#FFB3C6" class="confetti-sparkle" style="animation-delay: 1.2s;"/>
+
+  <!-- Floating Hearts -->
+  <g class="heart-anim-1" transform="translate(90, 140)">
+    <path d="M 0 10 C -10 -5 -25 5 -20 20 C -15 30 0 40 0 40 C 0 40 15 30 20 20 C 25 5 10 -5 0 10 Z" fill="#FB6F92"/>
+  </g>
+  <g class="heart-anim-2" transform="translate(350, 160)">
+    <path d="M 0 8 C -8 -4 -20 4 -16 16 C -12 24 0 32 0 32 C 0 32 12 24 16 16 C 20 4 8 -4 0 8 Z" fill="#FF8FAB"/>
+  </g>
+
+  <!-- Cute Dancing Birthday Bear Group -->
+  <g class="bear-body">
+    <!-- Bear Shadow -->
+    <ellipse cx="225" cy="335" rx="75" ry="14" fill="rgba(220, 130, 160, 0.25)"/>
+
+    <!-- Left Ear -->
+    <circle cx="160" cy="150" r="28" fill="#DEB887"/>
+    <circle cx="160" cy="150" r="16" fill="#FFCCD8"/>
+
+    <!-- Right Ear -->
+    <circle cx="290" cy="150" r="28" fill="#DEB887"/>
+    <circle cx="290" cy="150" r="16" fill="#FFCCD8"/>
+
+    <!-- Bear Body -->
+    <ellipse cx="225" cy="270" rx="70" ry="60" fill="#DEB887" filter="url(#shadowGif)"/>
+    <!-- Tummy Patch -->
+    <ellipse cx="225" cy="275" rx="46" ry="40" fill="#FFF8F0"/>
+    <!-- Heart on Tummy -->
+    <path d="M 225 270 C 220 262 210 264 210 272 C 210 280 225 288 225 288 C 225 288 240 280 240 272 C 240 264 230 262 225 270 Z" fill="#FB6F92"/>
+
+    <!-- Paws Left & Right -->
+    <ellipse cx="145" cy="260" rx="20" ry="16" fill="#DEB887" transform="rotate(-20 145 260)"/>
+    <ellipse cx="305" cy="260" rx="20" ry="16" fill="#DEB887" transform="rotate(20 305 260)"/>
+
+    <!-- Feet -->
+    <ellipse cx="180" cy="325" rx="24" ry="16" fill="#DEB887"/>
+    <ellipse cx="180" cy="325" rx="14" ry="9" fill="#FFCCD8"/>
+    <ellipse cx="270" cy="325" rx="24" ry="16" fill="#DEB887"/>
+    <ellipse cx="270" cy="325" rx="14" ry="9" fill="#FFCCD8"/>
+
+    <!-- Bear Head -->
+    <circle cx="225" cy="190" r="65" fill="#DEB887" filter="url(#shadowGif)"/>
+
+    <!-- Cute Eyes -->
+    <ellipse cx="200" cy="180" rx="6" ry="8" fill="#3D2B1F"/>
+    <circle cx="198" cy="177" r="2.5" fill="#FFFFFF"/>
+    <ellipse cx="250" cy="180" rx="6" ry="8" fill="#3D2B1F"/>
+    <circle cx="248" cy="177" r="2.5" fill="#FFFFFF"/>
+
+    <!-- Blushing Pink Cheeks -->
+    <ellipse cx="185" cy="198" rx="12" ry="7" fill="#FFB3C6" opacity="0.85"/>
+    <ellipse cx="265" cy="198" rx="12" ry="7" fill="#FFB3C6" opacity="0.85"/>
+
+    <!-- Snout & Mouth -->
+    <ellipse cx="225" cy="200" rx="22" ry="16" fill="#FFF8F0"/>
+    <ellipse cx="225" cy="194" rx="8" ry="6" fill="#3D2B1F"/>
+    <path d="M 225 200 L 225 206 M 220 206 Q 225 210 230 206" stroke="#3D2B1F" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+
+    <!-- Party Horn / Blower in Mouth -->
+    <path d="M 230 206 Q 260 215 295 200" stroke="#FB6F92" stroke-width="5" stroke-linecap="round" fill="none"/>
+    <circle cx="295" cy="200" r="6" fill="#FCD34D"/>
+
+    <!-- Cute Party Hat with Pom-pom -->
+    <g class="party-hat">
+      <polygon points="225,85 198,135 252,135" fill="#FF8FAB"/>
+      <!-- Striped Hat -->
+      <polygon points="225,85 210,115 240,115" fill="#C9A9E8"/>
+      <circle cx="225" cy="85" r="9" fill="#FCD34D"/>
+      <!-- Hat Rim -->
+      <ellipse cx="225" cy="135" rx="28" ry="6" fill="#FFFFFF"/>
+    </g>
+  </g>
+
+  <!-- Banner at Bottom -->
+  <text x="225" y="375" font-family="'Caveat', cursive, sans-serif" font-size="28" font-weight="bold" fill="#D94876" text-anchor="middle">Yayyy It's Your Birthdayyy! 🥳🎂🎉</text>
+</svg>

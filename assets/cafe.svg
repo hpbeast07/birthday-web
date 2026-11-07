@@ -1,0 +1,64 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="100%" height="100%">
+  <defs>
+    <linearGradient id="cafebg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFFDF9"/>
+      <stop offset="60%" stop-color="#FFF3E8"/>
+      <stop offset="100%" stop-color="#FFE4EC"/>
+    </linearGradient>
+    <filter id="shadow2" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="5" stdDeviation="5" flood-color="#C08090" flood-opacity="0.2"/>
+    </filter>
+  </defs>
+
+  <rect width="400" height="400" fill="url(#cafebg)"/>
+
+  <!-- Cute bunting garland at top -->
+  <path d="M 30 30 Q 110 55 190 35 Q 280 55 370 30" fill="none" stroke="#E8B87D" stroke-width="2"/>
+  <polygon points="60,40 85,45 72,70" fill="#FFCCD8"/>
+  <polygon points="120,47 145,45 132,73" fill="#C9A9E8"/>
+  <polygon points="180,36 205,38 192,65" fill="#FFB3C6"/>
+  <polygon points="240,43 265,47 252,72" fill="#FDE68A"/>
+  <polygon points="300,42 325,37 312,68" fill="#FFCCD8"/>
+
+  <!-- Cafe Table -->
+  <ellipse cx="200" cy="330" rx="170" ry="45" fill="#FFFFFF" filter="url(#shadow2)"/>
+  <ellipse cx="200" cy="328" rx="165" ry="40" fill="#FFF9F5"/>
+
+  <!-- Boba Cup (Left) -->
+  <rect x="110" y="195" width="60" height="90" rx="12" fill="#FFF" filter="url(#shadow2)"/>
+  <!-- Boba tea liquid (Taro/Lavender) -->
+  <rect x="114" y="215" width="52" height="66" rx="8" fill="#E8D7F1"/>
+  <!-- Boba pearls -->
+  <circle cx="125" cy="270" r="5" fill="#8E65B5"/>
+  <circle cx="138" cy="273" r="5" fill="#8E65B5"/>
+  <circle cx="150" cy="269" r="5" fill="#8E65B5"/>
+  <circle cx="132" cy="262" r="5" fill="#8E65B5"/>
+  <circle cx="145" cy="260" r="5" fill="#8E65B5"/>
+  <!-- Cup Lid & Straw -->
+  <ellipse cx="140" cy="195" rx="33" ry="8" fill="#FFCCD8"/>
+  <line x1="140" y1="200" x2="152" y2="150" stroke="#FB6F92" stroke-width="6" stroke-linecap="round"/>
+
+  <!-- Coffee / Matcha Cup with Saucer (Right) -->
+  <ellipse cx="270" cy="285" rx="42" ry="12" fill="#FFFFFF" filter="url(#shadow2)"/>
+  <path d="M 240 240 L 245 280 Q 270 286 295 280 L 300 240 Z" fill="#FFFFFF" filter="url(#shadow2)"/>
+  <!-- Coffee Cup handle -->
+  <path d="M 298 250 C 315 250 315 272 296 272" fill="none" stroke="#FFFFFF" stroke-width="6" stroke-linecap="round"/>
+  <!-- Matcha / Latte liquid -->
+  <ellipse cx="270" cy="242" rx="27" ry="9" fill="#FFCCD8"/>
+  <!-- Latte Art Heart -->
+  <path d="M 270 245 C 267 241 262 242 262 245 C 262 248 270 252 270 252 C 270 252 278 248 278 245 C 278 242 273 241 270 245 Z" fill="#FFFDF9"/>
+
+  <!-- Steam coming from coffee -->
+  <path d="M 264 225 Q 260 215 266 205 Q 272 195 268 185" fill="none" stroke="#FFB3C6" stroke-width="2" stroke-linecap="round" opacity="0.7"/>
+  <path d="M 276 222 Q 282 212 276 202 Q 270 192 276 182" fill="none" stroke="#C9A9E8" stroke-width="2" stroke-linecap="round" opacity="0.7"/>
+
+  <!-- Sweet Croissant / Cookie Plate -->
+  <ellipse cx="200" cy="305" rx="30" ry="14" fill="#FFFFFF" filter="url(#shadow2)"/>
+  <path d="M 188 305 Q 200 295 212 305 Q 200 310 188 305 Z" fill="#E8B87D"/>
+
+  <!-- Sparkles -->
+  <path d="M 80 140 Q 80 150 90 150 Q 80 150 80 160 Q 80 150 70 150 Q 80 150 80 140 Z" fill="#FB6F92"/>
+  <path d="M 330 140 Q 330 148 338 148 Q 330 148 330 156 Q 330 148 322 148 Q 330 148 330 140 Z" fill="#FCD34D"/>
+
+  <text x="200" y="115" font-family="'Caveat', cursive, sans-serif" font-size="28" font-weight="bold" fill="#705364" text-anchor="middle">Boba Chats &amp; Endless Laughter 🧋</text>
+</svg>

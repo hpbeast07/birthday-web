@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+  <title>Happy Birthday, Beautiful! 🎀✨ | Ek Pyaara Sa Surprise</title>
+  <meta name="description" content="A cute, aesthetic Pinterest-inspired birthday website in respectful Hinglish filled with beautiful memories, heartfelt wishes, and magical surprises.">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Floating Sparkles and Fireworks Canvases -->
+  <canvas id="sparkle-canvas"></canvas>
+  <canvas id="fireworks-canvas"></canvas>
+
+  <!-- ==========================================================================
+       ADMIN CONTROL BAR (Only visible to you while setting up, NOT for Birthday Girl)
+       ========================================================================== -->
+  <div id="admin-bar" class="admin-bar">
+    <div class="admin-bar-left">
+      <span class="admin-bar-badge">ADMIN CONTROLS</span>
+      <span id="supabase-status-indicator" style="font-size: 0.8rem; color: var(--text-muted);">
+        ☁️ Checking Supabase...
+      </span>
+    </div>
+    <div class="admin-bar-actions">
+      <button id="btn-toggle-view-mode" class="btn-admin-action" title="Dekhiye ki Birthday Girl ko website kaisi dikhegi">
+        <span>👁️</span> Birthday Girl View Check Kijiye
+      </button>
+      <button id="btn-copy-share-link" class="btn-admin-action primary" title="Bhejne ke liye Clean Link copy kijiye">
+        <span>🔗</span> Shareable Link Copy Kijiye
+      </button>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       1. WELCOME SCREEN OVERLAY (RESPECTFUL "AAP" EDITION)
+       ========================================================================== -->
+  <div id="welcome-screen" class="welcome-screen">
+    <!-- Floating pastel decorations behind card -->
+    <div class="floating-bg-item" style="top: 12%; left: 8%; font-size: 2.5rem;">🌸</div>
+    <div class="floating-bg-item" style="top: 18%; right: 12%; font-size: 2.2rem; animation-delay: 1.5s;">✨</div>
+    <div class="floating-bg-item" style="bottom: 15%; left: 14%; font-size: 2.8rem; animation-delay: 3s;">🎀</div>
+    <div class="floating-bg-item" style="bottom: 12%; right: 10%; font-size: 2.4rem; animation-delay: 2s;">💖</div>
+    <div class="floating-bg-item" style="top: 45%; left: 4%; font-size: 2rem; animation-delay: 4s;">🧁</div>
+    <div class="floating-bg-item" style="top: 52%; right: 5%; font-size: 2rem; animation-delay: 2.5s;">🌷</div>
+
+    <div class="welcome-card">
+      <div class="washi-tape cream top-center"></div>
+
+      <!-- Cute Animated 3D Gift Box -->
+      <div id="gift-box-wrapper" class="gift-box-wrapper" title="Click karke surprise kholiye!">
+        <svg class="gift-svg" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <ellipse cx="60" cy="110" rx="45" ry="8" fill="rgba(251, 111, 146, 0.2)"/>
+          <rect x="25" y="48" width="70" height="54" rx="10" fill="#FFCCD8"/>
+          <rect x="25" y="48" width="70" height="54" rx="10" fill="url(#giftBoxGrad)"/>
+          <rect x="52" y="48" width="16" height="54" fill="#FB6F92"/>
+          <rect x="20" y="34" width="80" height="18" rx="7" fill="#FFB3C6" filter="drop-shadow(0 4px 6px rgba(0,0,0,0.08))"/>
+          <rect x="52" y="34" width="16" height="18" fill="#FB6F92"/>
+          <path d="M 52 34 C 35 15 25 30 52 34 Z" fill="#FB6F92"/>
+          <path d="M 50 33 C 38 20 32 30 50 33 Z" fill="#FF8FAB"/>
+          <path d="M 68 34 C 85 15 95 30 68 34 Z" fill="#FB6F92"/>
+          <path d="M 70 33 C 82 20 88 30 70 33 Z" fill="#FF8FAB"/>
+          <ellipse cx="60" cy="34" rx="8" ry="6" fill="#D9385B"/>
+          <defs>
+            <linearGradient id="giftBoxGrad" x1="25" y1="48" x2="95" y2="102" gradientUnits="userSpaceOnUse">
+              <stop stop-color="#FFE4EC"/>
+              <stop offset="1" stop-color="#FFCCD8"/>
+            </linearGradient>
+          </defs>
+        </svg>
+      </div>
+
+      <h1 class="welcome-title">Hey Birthday Girl! <span class="bow">🎀</span></h1>
+      <p class="welcome-subtitle">Kisi bohot special ne aapke liye ek pyaara sa surprise banaya hai...</p>
+
+      <button id="btn-open-surprise" class="btn-open-surprise">
+        <span>Apna Surprise Kholiye</span>
+        <span style="font-size: 1.35rem;">💗</span>
+      </button>
+
+      <div class="welcome-hint">
+        <span>✨ Tip: Sound on kar lijiye sabse sweet experience ke liye!</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       NAVIGATION BAR & FLOATING CONTROLS
+       ========================================================================== -->
+  <header class="site-header">
+    <nav class="nav-container">
+      <a href="#hero-section" class="nav-brand">
+        <span>Happy Birthday</span> <span>🌸</span>
+      </a>
+
+      <button id="mobile-nav-toggle" class="mobile-nav-toggle" aria-label="Toggle navigation">
+        ☰
+      </button>
+
+      <ul id="nav-links" class="nav-links">
+        <li><a href="#hero-section" class="nav-link">🎂 Wishes</a></li>
+        <li><a href="#gif-section" class="nav-link">🧸 Birthday GIF</a></li>
+        <li><a href="#gallery-section" class="nav-link">📸 Yaadein</a></li>
+        <li><a href="#reasons-section" class="nav-link">✨ Khaas Baatein</a></li>
+        <li><a href="#letter-section" class="nav-link">💌 Special Letter</a></li>
+        <li><a href="#timeline-section" class="nav-link">📖 Dosti Ke Kisse</a></li>
+        <li><a href="#final-section" class="nav-link">🎆 Grand Finale</a></li>
+      </ul>
+
+      <div class="nav-actions">
+        <a href="#final-section" class="btn-icon-soft" title="Patakhe & Celebration">🎆</a>
+      </div>
+    </nav>
+  </header>
+
+  <!-- FLOATING MUSIC PLAYER WIDGET -->
+  <div id="floating-music-widget" class="floating-music-widget">
+    <div id="music-disc" class="music-disc">
+      <span>🎵</span>
+    </div>
+    <div class="music-info">
+      <div id="music-title" class="music-title">Dreamy Music Box</div>
+      <div id="music-status" class="music-status">
+        <div class="sound-bars">
+          <div class="sound-bar paused"></div>
+          <div class="sound-bar paused"></div>
+          <div class="sound-bar paused"></div>
+        </div>
+        <span>Melody</span>
+      </div>
+    </div>
+    <div class="music-controls">
+      <button id="btn-music-play" class="btn-music-play" title="Play / Pause">▶️</button>
+      <button id="btn-music-mute" class="btn-music-mute" title="Mute / Unmute">🔊</button>
+      <button id="btn-music-change" class="btn-music-change" title="Apna Gaana Upload Kijiye (MP3)">📁</button>
+      <input type="file" id="custom-audio-input" accept="audio/*" style="display: none;">
+    </div>
+  </div>
+
+  <main>
+    <!-- ==========================================================================
+         2. BIRTHDAY HERO SECTION & ANIMATED CAKE (RESPECTFUL)
+         ========================================================================== -->
+    <section id="hero-section" class="hero-section">
+      <!-- Floating Balloons -->
+      <div class="balloon-container">
+        <div class="balloon balloon-1"></div>
+        <div class="balloon balloon-2"></div>
+        <div class="balloon balloon-3"></div>
+        <div class="balloon balloon-4"></div>
+        <div class="balloon balloon-5"></div>
+      </div>
+
+      <div class="container hero-content">
+        <div class="hero-ribbon">
+          <span>✨</span> Meri Sabse Pyaari Dost Ke Liye <span>✨</span>
+        </div>
+
+        <h1 class="hero-title">
+          Happy Birthday, <span class="highlight-sparkle">Beautiful!</span> 🎂
+        </h1>
+
+        <!-- Editable Birthday Wishes Box -->
+        <div class="hero-wishes-box">
+          <div class="washi-tape top-left"></div>
+          <div class="washi-tape lavender top-right"></div>
+          <p id="hero-wishes-text" class="hero-wishes-text">
+            "Aapko janamdin ki dher saari mubarakbaad aur badhaiyan! Rab kare aapka yeh saal bohot saari khushiyan, sukoon, hasi, aur success lekar aaye. Aap hamesha aise hi muskurate rahein aur jo bhi aap chahein wo sab aapko mile! 💖"
+          </p>
+          <button id="btn-edit-hero-wish" class="btn-edit-inline" title="Yeh message edit kijiye">
+            <span>✏️</span> Wish Message Edit Kijiye
+          </button>
+        </div>
+
+        <!-- Interactive 3-Tier Birthday Cake with Blowable Candles -->
+        <div class="cake-wrapper">
+          <div class="cake-container" title="Candles pe click karke bujha sakte hain!">
+            <!-- Candles Row -->
+            <div class="candles-row">
+              <div class="candle" data-index="1">
+                <div class="candle-wick"></div>
+                <div class="candle-flame"></div>
+                <div class="smoke-puff"></div>
+              </div>
+              <div class="candle" data-index="2">
+                <div class="candle-wick"></div>
+                <div class="candle-flame"></div>
+                <div class="smoke-puff"></div>
+              </div>
+              <div class="candle" data-index="3">
+                <div class="candle-wick"></div>
+                <div class="candle-flame"></div>
+                <div class="smoke-puff"></div>
+              </div>
+              <div class="candle" data-index="4">
+                <div class="candle-wick"></div>
+                <div class="candle-flame"></div>
+                <div class="smoke-puff"></div>
+              </div>
+              <div class="candle" data-index="5">
+                <div class="candle-wick"></div>
+                <div class="candle-flame"></div>
+                <div class="smoke-puff"></div>
+              </div>
+            </div>
+
+            <!-- Tier 3 (Top Tier) -->
+            <div class="cake-tier tier-top">
+              <div class="cake-frosting frosting-top"></div>
+              <div class="cake-decorations">
+                <span class="strawberry">🍓</span>
+                <span class="strawberry">🌸</span>
+                <span class="strawberry">🍓</span>
+              </div>
+            </div>
+
+            <!-- Tier 2 (Middle Tier) -->
+            <div class="cake-tier tier-middle">
+              <div class="cake-frosting frosting-middle"></div>
+              <div class="cake-decorations" style="top: -6px;">
+                <span class="strawberry">✨</span>
+                <span class="strawberry">🍓</span>
+                <span class="strawberry">✨</span>
+                <span class="strawberry">🍓</span>
+              </div>
+            </div>
+
+            <!-- Tier 1 (Bottom Tier) -->
+            <div class="cake-tier tier-bottom">
+              <div class="cake-frosting frosting-bottom">
+                <div class="frosting-drip"></div>
+                <div class="frosting-drip" style="height: 18px;"></div>
+                <div class="frosting-drip"></div>
+                <div class="frosting-drip" style="height: 16px;"></div>
+                <div class="frosting-drip"></div>
+              </div>
+            </div>
+
+            <!-- Cake Plate -->
+            <div class="cake-plate"></div>
+          </div>
+
+          <!-- Cake Action Buttons -->
+          <div class="cake-actions">
+            <button id="btn-blow-candles" class="btn-cake-action">
+              <span>💨</span> Wish Maangiye Aur Candles Bujhaiye
+            </button>
+          </div>
+
+          <!-- Banner that pops up when candles are blown out -->
+          <div id="wish-made-banner" class="wish-made-banner">
+            🌟 "Aapki saari wishes aur sapne poore ho jayein, birthday girl!" 🌟
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================================================
+         FEATURED CUTE BIRTHDAY GIF SECTION 🧸🎀
+         ========================================================================== -->
+    <section id="gif-section" class="gif-section">
+      <div class="container">
+        <div class="section-header">
+          <span class="section-badge">🧸 Birthday Mood &amp; Vibes</span>
+          <h2 class="section-title">The Birthday Girl Energy! 💃✨</h2>
+          <p class="section-subtitle">Dher saari khushiyan, sweet moments aur full birthday celebration vibes! 🎀</p>
+        </div>
+
+        <div class="gif-showcase-card">
+          <div class="washi-tape top-left"></div>
+          <div class="washi-tape lavender top-right"></div>
+
+          <div class="gif-media-wrapper">
+            <img id="featured-gif-img" src="assets/cute_birthday_bear.svg" alt="Birthday Mood GIF" class="gif-media-img">
+          </div>
+
+          <p id="gif-caption-text" class="gif-caption-text">Party toh banti hai boss! 🥳🎂🎉</p>
+
+          <div class="gif-toolbar">
+            <button id="btn-change-gif" class="btn-upload-photos" style="padding: 10px 22px; font-size: 0.95rem;">
+              <span>🖼️</span> Apna GIF Badliye / Add Kijiye
+            </button>
+            <button id="btn-edit-gif-caption" class="btn-gallery-action" style="padding: 9px 18px; font-size: 0.9rem;">
+              <span>✏️</span> Caption Edit Kijiye
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================================================
+         3. PHOTO GALLERY (HUMARI PYAARI YAADEIN 📸) - POLAROID WALL
+         ========================================================================== -->
+    <section id="gallery-section" class="gallery-section">
+      <div class="container">
+        <div class="section-header">
+          <span class="section-badge">📸 Snapshot Moments</span>
+          <h2 class="section-title">Humari Pyaari Yaadein</h2>
+          <p class="section-subtitle">Har ek photo me ek pyaari si kahani aur dher saari hasi chhupi hai 🌸</p>
+        </div>
+
+        <!-- Gallery Toolbar -->
+        <div class="gallery-toolbar">
+          <button id="btn-open-upload-modal" class="btn-upload-photos">
+            <span>➕</span> Apni Photos Add Kijiye
+          </button>
+          <button id="btn-shuffle-photos" class="btn-gallery-action">
+            <span>✨</span> Photos Shuffle Kijiye
+          </button>
+        </div>
+
+        <!-- Polaroid Wall Grid -->
+        <div id="polaroids-grid" class="polaroids-grid">
+          <!-- Rendered dynamically by script.js from IndexedDB -->
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================================================
+         4. REASONS WHY YOU ARE SPECIAL ✨ (6 RESPECTFUL REASONS)
+         ========================================================================== -->
+    <section id="reasons-section" class="reasons-section">
+      <div class="container">
+        <div class="section-header">
+          <span class="section-badge">💖 Dil Se Likha Hua</span>
+          <h2 class="section-title">Khaas Baatein Jo Aapko Sabse Special Banati Hain</h2>
+          <p class="section-subtitle">Wo pyaari aur khaas baatein jo batati hain ki aap kitni anmol dost hain ✨</p>
+        </div>
+
+        <div id="reasons-grid" class="reasons-grid">
+          <!-- Rendered dynamically by script.js from localStorage -->
+        </div>
+
+        <div class="reasons-toolbar">
+          <button id="btn-open-edit-reasons" class="btn-gallery-action">
+            <span>✏️</span> Reasons Personalize Kijiye
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================================================
+         5. SPECIAL LETTER 💌 (RESPECTFUL DOST EDITION)
+         ========================================================================== -->
+    <section id="letter-section" class="letter-section">
+      <div class="container">
+        <div class="section-header">
+          <span class="section-badge">💌 Dosti Ka Khaas Note</span>
+          <h2 class="section-title">Aapke Liye Ek Khaas Letter</h2>
+          <p class="section-subtitle">Envelope ki wax seal pe click kijiye aur dil se likha hua letter kholiye...</p>
+        </div>
+
+        <!-- Interactive Envelope -->
+        <div class="envelope-wrapper">
+          <div id="envelope-box" class="envelope-box">
+            <div class="washi-tape top-center"></div>
+            <div class="wax-seal">
+              <span>💖</span>
+            </div>
+            <h3 class="envelope-text-prompt">Tap Karke Letter Kholiye 💌</h3>
+            <p class="envelope-subtext">Sirf aapke liye ek dil se likha hua secret note</p>
+          </div>
+
+          <!-- Unfolded Letter Sheet -->
+          <div id="opened-letter-sheet" class="opened-letter-sheet">
+            <div class="letter-stamp">
+              <span style="font-size: 1.4rem;">🎀</span>
+              <span>SPECIAL</span>
+            </div>
+            <div id="letter-salutation" class="letter-salutation">Meri Sabse Pyaari Dost / Birthday Girl 🎀,</div>
+            <div id="letter-body" class="letter-body">
+              <!-- Loaded from storage -->
+            </div>
+            <div id="letter-closing" class="letter-closing">
+              <!-- Loaded from storage -->
+            </div>
+
+            <div class="letter-toolbar">
+              <button id="btn-edit-letter" class="btn-edit-inline">
+                <span>✏️</span> Letter Edit Kijiye
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================================================
+         6. OUR MEMORIES & FRIENDSHIP TIMELINE 📖 (RESPECTFUL)
+         ========================================================================== -->
+    <section id="timeline-section" class="timeline-section">
+      <div class="container">
+        <div class="section-header">
+          <span class="section-badge">📖 Humari Dosti Ke Kisse</span>
+          <h2 class="section-title">Dosti Ke Pyaare Chapters</h2>
+          <p class="section-subtitle">Pehle din se lekar aaj tak, har pal ekdum yaadgaar raha hai 💕</p>
+        </div>
+
+        <div class="timeline-toolbar">
+          <button id="btn-add-memory" class="btn-upload-photos" style="font-size: 0.95rem; padding: 10px 24px;">
+            <span>➕</span> Naya Chapter Add Kijiye
+          </button>
+        </div>
+
+        <div id="timeline-container" class="timeline-container">
+          <!-- Rendered dynamically by script.js -->
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================================================
+         7. FINAL SURPRISE & CELEBRATION 🎆 (RESPECTFUL)
+         ========================================================================== -->
+    <section id="final-section" class="final-section">
+      <div class="container">
+        <div class="final-card">
+          <div class="washi-tape top-left"></div>
+          <div class="washi-tape lavender top-right"></div>
+
+          <div class="final-badge">👑✨</div>
+
+          <h2 class="final-heading">
+            Aap iss poori universe ki saari <span>khushiyan deserve karti hain!</span> ❤️
+          </h2>
+
+          <p class="final-quote">
+            "Aap jaisi hain hamesha waisi hi rahiye—graceful, kind aur ekdum pyaari! The world is so much better with you." 🌟
+          </p>
+
+          <div class="final-buttons-row">
+            <button id="btn-launch-fireworks" class="btn-grand-celebrate">
+              <span>🎆</span> Patakhe / Fireworks Phodiye
+            </button>
+            <button id="btn-virtual-hug" class="btn-virtual-hug">
+              <span>🤗</span> Virtual Hug Bhejiye
+            </button>
+          </div>
+
+          <!-- Secret Wish Jar -->
+          <div class="wish-jar-card">
+            <h4 style="font-family: var(--font-heading); font-size: 1.25rem; color: var(--color-pink-deep); margin-bottom: 4px;">
+              🔮 Secret Birthday Wishing Well
+            </h4>
+            <p style="font-size: 0.88rem; color: var(--text-muted);">
+              Apna koi bhi secret sapna ya wish iss magic jar me daal ke lock kar lijiye... Yeh hamesha safe rahegi!
+            </p>
+            <div class="wish-jar-input-row">
+              <input type="text" id="wish-jar-input" class="wish-input" placeholder="Apni secret wish likhiye aur seal kijiye... ✨">
+              <button id="btn-save-wish" class="btn-save-wish">Wish Seal Kijiye 🌟</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ==========================================================================
+       SITE FOOTER & RESTORE OPTION
+       ========================================================================== -->
+  <footer class="site-footer">
+    <div class="container">
+      <p class="footer-text">Made with pure dosti, sparkles aur pink ribbons 🎀</p>
+      <div class="footer-actions">
+        <button id="btn-reset-website" class="btn-reset-site" title="Default template pe reset kijiye">
+          <span>🔄</span> Reset to Default Template
+        </button>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ==========================================================================
+       MODALS
+       ========================================================================== -->
+
+  <!-- Modal 1: Multi-photo Uploader with Preview -->
+  <div id="modal-upload-photos" class="modal-overlay">
+    <div class="modal-dialog">
+      <button id="btn-close-upload-modal" class="modal-close-btn">&times;</button>
+      <div class="modal-header">
+        <h3 class="modal-title">Apni Photos Add Kijiye 📸</h3>
+        <p class="modal-subtitle">Apne phone ya computer se multiple photos select kijiye (JPG, PNG, WEBP). Preview dekh kar cute captions likhiye!</p>
+      </div>
+
+      <!-- Drag & Drop Zone -->
+      <div id="upload-dropzone" class="dropzone">
+        <div class="dropzone-icon">📷</div>
+        <div class="dropzone-text">Photos Yahan Drop Kijiye Ya Click Kijiye</div>
+        <div class="dropzone-hint">Support karta hai multiple files (JPG, JPEG, PNG, WEBP)</div>
+        <input type="file" id="gallery-file-input" multiple accept="image/png, image/jpeg, image/jpg, image/webp" style="display: none;">
+      </div>
+
+      <!-- Previews List -->
+      <div id="upload-previews-list" class="upload-previews-list"></div>
+
+      <div class="modal-actions">
+        <button id="btn-save-uploaded-photos" class="btn-upload-photos" style="padding: 11px 26px;">
+          Gallery Me Save Kijiye 💖
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal 2: Lightbox Full-screen Photo Viewer -->
+  <div id="modal-lightbox" class="modal-overlay">
+    <div class="modal-dialog lightbox-dialog">
+      <button id="btn-close-lightbox" class="modal-close-btn" style="background: white; top: -15px; right: -15px;">&times;</button>
+      <img id="lightbox-img" class="lightbox-img" src="" alt="Memory">
+      <div id="lightbox-caption" class="lightbox-caption"></div>
+    </div>
+  </div>
+
+  <!-- Modal 3: Change GIF Modal -->
+  <div id="modal-change-gif" class="modal-overlay">
+    <div class="modal-dialog">
+      <button id="btn-close-gif-modal" class="modal-close-btn">&times;</button>
+      <div class="modal-header">
+        <h3 class="modal-title">Apna Birthday GIF Set Kijiye 🧸</h3>
+        <p class="modal-subtitle">Apne phone ya PC se koi bhi GIF upload kijiye, ya direct link paste kijiye!</p>
+      </div>
+
+      <!-- Option 1: File Upload -->
+      <div class="form-group" style="text-align: center; margin-bottom: 24px;">
+        <label class="form-label">Device Se GIF Select Kijiye</label>
+        <button class="btn-upload-photos" onclick="document.getElementById('gif-file-input').click()" style="padding: 10px 22px; font-size: 0.95rem;">
+          📁 Device Se GIF / Video Choose Kijiye
+        </button>
+        <input type="file" id="gif-file-input" accept="image/gif, image/png, image/jpeg, image/webp" style="display: none;">
+      </div>
+
+      <div style="text-align: center; margin: 12px 0; color: var(--text-muted); font-weight: bold;">— YA PHIR —</div>
+
+      <!-- Option 2: Paste URL -->
+      <div class="form-group">
+        <label class="form-label" for="gif-url-input">GIF Ka URL Paste Kijiye (Tenor, Giphy, Web)</label>
+        <input type="url" id="gif-url-input" class="form-control" placeholder="https://media.giphy.com/media/.../giphy.gif">
+      </div>
+
+      <div class="modal-actions">
+        <button id="btn-save-gif-url" class="btn-upload-photos" style="padding: 10px 24px;">URL Save Kijiye ✨</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal 4: Edit Reason Modal -->
+  <div id="modal-edit-reason" class="modal-overlay">
+    <div class="modal-dialog">
+      <button id="btn-close-reason-modal" class="modal-close-btn">&times;</button>
+      <div class="modal-header">
+        <h3 class="modal-title">Reason Edit Kijiye 💖</h3>
+        <p class="modal-subtitle">Is reason ko aur personal aur pyaara banaiye.</p>
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="edit-reason-emoji">Icon / Emoji</label>
+        <input type="text" id="edit-reason-emoji" class="form-control" style="width: 80px;" maxlength="4">
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="edit-reason-title">Title</label>
+        <input type="text" id="edit-reason-title" class="form-control" placeholder="e.g. Aapki Pyaari & Positive Smile">
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="edit-reason-desc">Description</label>
+        <textarea id="edit-reason-desc" class="form-control" placeholder="Yeh baat kyun itni special hai..."></textarea>
+      </div>
+      <div class="modal-actions">
+        <button id="btn-save-reason" class="btn-upload-photos" style="padding: 10px 24px;">Reason Save Kijiye ✨</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal 5: Edit Letter Modal -->
+  <div id="modal-edit-letter" class="modal-overlay">
+    <div class="modal-dialog" style="max-width: 680px;">
+      <button id="btn-close-letter-modal" class="modal-close-btn">&times;</button>
+      <div class="modal-header">
+        <h3 class="modal-title">Birthday Letter Edit Kijiye 💌</h3>
+        <p class="modal-subtitle">Apne dil ki baat likhiye. Yeh safely browser me save ho jayegi.</p>
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="edit-letter-salutation">Salutation</label>
+        <input type="text" id="edit-letter-salutation" class="form-control" placeholder="Meri Sabse Pyaari Dost / Birthday Girl 🎀,">
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="edit-letter-body">Letter Ka Content</label>
+        <textarea id="edit-letter-body" class="form-control" style="min-height: 220px;" placeholder="Dil se likhiye..."></textarea>
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="edit-letter-closing">Sign-off & Closing</label>
+        <input type="text" id="edit-letter-closing" class="form-control" placeholder="Aapka / Aapki Lifetime Best Friend 🌸">
+      </div>
+      <div class="modal-actions">
+        <button id="btn-save-letter" class="btn-upload-photos" style="padding: 10px 24px;">Letter Save Kijiye 💖</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal 6: Edit Memory Timeline Modal -->
+  <div id="modal-edit-memory" class="modal-overlay">
+    <div class="modal-dialog">
+      <button id="btn-close-memory-modal" class="modal-close-btn">&times;</button>
+      <div class="modal-header">
+        <h3 class="modal-title">Memory Chapter 📖</h3>
+        <p class="modal-subtitle">Koi special moment, funny kissa ya milestone capture kijiye.</p>
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="edit-memory-date">Chapter / Kissa</label>
+        <input type="text" id="edit-memory-date" class="form-control" placeholder="e.g. Kissa 1 ya College Ke Din">
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="edit-memory-tag">Tag / Badge</label>
+        <input type="text" id="edit-memory-tag" class="form-control" placeholder="e.g. Inside Joke 😂 ya Road Trip 🚗">
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="edit-memory-title">Title</label>
+        <input type="text" id="edit-memory-title" class="form-control" placeholder="e.g. Pehli Baar Jab Hum Mile The">
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="edit-memory-story">Kahani / Details</label>
+        <textarea id="edit-memory-story" class="form-control" placeholder="Yeh pal kyun itna yaadgaar tha?"></textarea>
+      </div>
+      <div class="modal-actions">
+        <button id="btn-save-memory" class="btn-upload-photos" style="padding: 10px 24px;">Chapter Save Kijiye 🌸</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal 7: Edit Simple Text Modal -->
+  <div id="modal-edit-simple" class="modal-overlay">
+    <div class="modal-dialog">
+      <button id="btn-close-simple-modal" class="modal-close-btn">&times;</button>
+      <div class="modal-header">
+        <h3 id="edit-simple-title" class="modal-title">Edit Kijiye</h3>
+      </div>
+      <div class="form-group">
+        <textarea id="edit-simple-input" class="form-control" style="min-height: 120px;"></textarea>
+      </div>
+      <div class="modal-actions">
+        <button id="btn-save-simple" class="btn-upload-photos" style="padding: 10px 24px;">Save Changes ✨</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal 8: Generic Notification Modal (Virtual Hug, etc.) -->
+  <div id="modal-notification" class="modal-overlay">
+    <div class="modal-dialog" style="text-align: center; max-width: 480px;">
+      <button id="btn-close-notif" class="modal-close-btn">&times;</button>
+      <div style="font-size: 3.2rem; margin-bottom: 12px;">💖✨</div>
+      <h3 id="notif-title" class="modal-title" style="margin-bottom: 12px;"></h3>
+      <p id="notif-msg" style="font-size: 1.05rem; color: var(--text-secondary); line-height: 1.7; white-space: pre-line; margin-bottom: 24px;"></p>
+      <button class="btn-upload-photos" onclick="document.getElementById('modal-notification').classList.remove('active')" style="padding: 10px 26px;">
+        Aww, Thank You! 🥰
+      </button>
+    </div>
+  </div>
+
+  <!-- Supabase JS Client & Config -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-config.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
