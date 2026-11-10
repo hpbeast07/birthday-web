@@ -292,7 +292,11 @@ Always stay the same graceful & awesome soul you are. Happy Birthday! 💖✨`,
   async function getPasscodeConfig() {
     if (supabase) {
       try {
-        const { data } = await supabase.from('birthday_settings').select('value').eq('key', 'passcode_lock').single();
+        const { data } = await supabase
+          .from('birthday_settings')
+          .select('value')
+          .eq('key', 'passcode_lock')
+          .maybeSingle();
         if (data && data.value) return data.value;
       } catch (e) {}
     }
@@ -463,22 +467,14 @@ Always stay the same graceful & awesome soul you are. Happy Birthday! 💖✨`,
     }
   }
 
-  // Initialize Seeds
   async function initSeedsIfNeeded() {
-    const isInit = localStorage.getItem(STORAGE_KEYS.INITIALIZED_RESPECT_V4);
-    if (!isInit) {
-      await saveLetterData(DEFAULT_LETTER);
-      await saveTimelineData(DEFAULT_TIMELINE);
-      await saveGifData(DEFAULT_GIF_URL, DEFAULT_GIF_CAPTION);
-      localStorage.setItem(STORAGE_KEYS.HERO_WISH, "Aapko janamdin ki dher saari mubarakbaad aur badhaiyan! Rab kare aapka yeh saal bohot saari khushiyan, sukoon, hasi, aur success lekar aaye. Aap hamesha aise hi muskurate rahein aur jo bhi aap chahein wo sab aapko mile! 💖");
+    localStorage.setItem(
+        STORAGE_KEYS.INITIALIZED_RESPECT_V4,
+        'true'
+    );
 
-      await clearPhotosDBLocal();
-      for (const p of DEFAULT_PHOTOS) {
-        await savePhoto(p);
-      }
-      localStorage.setItem(STORAGE_KEYS.INITIALIZED_RESPECT_V4, 'true');
-    }
-  }
+    console.log('Initialization complete. Using existing data.');
+}
 
   // ==========================================
   // 7. WEB AUDIO MUSIC BOX SYNTHESIZER
@@ -1896,10 +1892,6 @@ Always stay the same graceful & awesome soul you are. Happy Birthday! 💖✨`,
       resetBtn.addEventListener('click', async () => {
         if (confirm('Kya sach me website ko default respectful bestie template pe reset karna hai? Isse saari original photos aur text restore ho jayenge. 🌸')) {
           localStorage.clear();
-          await clearPhotosDBLocal();
-          for (const p of DEFAULT_PHOTOS) {
-            await savePhoto(p);
-          }
           await saveLetterData(DEFAULT_LETTER);
           await saveTimelineData(DEFAULT_TIMELINE);
           await saveGifData(DEFAULT_GIF_URL, DEFAULT_GIF_CAPTION);
