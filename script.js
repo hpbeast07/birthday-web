@@ -329,15 +329,24 @@ Always stay the same graceful & awesome soul you are. Happy Birthday! 💖✨`,
   }
 
   async function getReasonsData() {
-    if (supabase) {
-      try {
-        const { data } = await supabase.from('birthday_settings').select('value').eq('key', 'reasons').single();
-        if (data && data.value) return data.value;
-      } catch (e) {}
+    if (!supabase) {
+        console.error('Supabase connection unavailable!');
+        return [];
     }
-    const stored = localStorage.getItem(STORAGE_KEYS.REASONS);
-    return stored ? JSON.parse(stored) : DEFAULT_REASONS;
-  }
+
+    const { data, error } = await supabase
+        .from('birthday_settings')
+        .select('value')
+        .eq('key', 'reasons')
+        .maybeSingle();
+
+    if (error) {
+        console.error('Reasons fetch error:', error);
+        return [];
+    }
+
+    return data?.value || [];
+}
   async function saveReasonsData(data) {
     localStorage.setItem(STORAGE_KEYS.REASONS, JSON.stringify(data));
     if (supabase) {
@@ -459,7 +468,6 @@ Always stay the same graceful & awesome soul you are. Happy Birthday! 💖✨`,
     const isInit = localStorage.getItem(STORAGE_KEYS.INITIALIZED_RESPECT_V4);
     if (!isInit) {
       await saveLetterData(DEFAULT_LETTER);
-      await saveReasonsData(DEFAULT_REASONS);
       await saveTimelineData(DEFAULT_TIMELINE);
       await saveGifData(DEFAULT_GIF_URL, DEFAULT_GIF_CAPTION);
       localStorage.setItem(STORAGE_KEYS.HERO_WISH, "Aapko janamdin ki dher saari mubarakbaad aur badhaiyan! Rab kare aapka yeh saal bohot saari khushiyan, sukoon, hasi, aur success lekar aaye. Aap hamesha aise hi muskurate rahein aur jo bhi aap chahein wo sab aapko mile! 💖");
@@ -1893,7 +1901,6 @@ Always stay the same graceful & awesome soul you are. Happy Birthday! 💖✨`,
             await savePhoto(p);
           }
           await saveLetterData(DEFAULT_LETTER);
-          await saveReasonsData(DEFAULT_REASONS);
           await saveTimelineData(DEFAULT_TIMELINE);
           await saveGifData(DEFAULT_GIF_URL, DEFAULT_GIF_CAPTION);
           localStorage.setItem(STORAGE_KEYS.HERO_WISH, "Aapko janamdin ki dher saari mubarakbaad aur badhaiyan! Rab kare aapka yeh saal bohot saari khushiyan, sukoon, hasi, aur success lekar aaye. Aap hamesha aise hi muskurate rahein aur jo bhi aap chahein wo sab aapko mile! 💖");
