@@ -292,8 +292,8 @@ Always stay the same graceful & awesome soul you are. Happy Birthday! 💖✨`,
 
   const DEFAULT_PASSCODE_CONFIG = {
     enabled: true,
-    passcode: '1234',
-    hint: 'Hint: 1234 enter kijiye ya apna secret code 🎀'
+    passcode: '1301',
+    hint: 'Hint: 1301 enter kijiye ya apna secret code 🎀'
   };
 
   async function getPasscodeConfig() {
@@ -1982,7 +1982,7 @@ Always stay the same graceful & awesome soul you are. Happy Birthday! 💖✨`,
     function updateAdminUI(cfg) {
       if (adminPill) {
         if (cfg.enabled) {
-          adminPill.textContent = cfg.passcode || '1234';
+          adminPill.textContent = cfg.passcode || '1301';
           adminPill.style.color = 'var(--color-pink-deep)';
         } else {
           adminPill.textContent = 'Off';
@@ -2030,7 +2030,7 @@ Always stay the same graceful & awesome soul you are. Happy Birthday! 💖✨`,
       if (!passcodeInput) return;
       const entered = passcodeInput.value.trim();
       currentConfig = await getPasscodeConfig();
-      const expected = (currentConfig.passcode || '1234').toString().trim();
+      const expected = (currentConfig.passcode || '1301').toString().trim();
 
       if (!currentConfig.enabled || entered.toLowerCase() === expected.toLowerCase()) {
         // SUCCESS UNLOCK!
@@ -2093,7 +2093,7 @@ Always stay the same graceful & awesome soul you are. Happy Birthday! 💖✨`,
       btnSetupPasscode.addEventListener('click', async () => {
         currentConfig = await getPasscodeConfig();
         if (toggleEnabled) toggleEnabled.checked = currentConfig.enabled !== false;
-        if (adminPassInput) adminPassInput.value = currentConfig.passcode || '1234';
+        if (adminPassInput) adminPassInput.value = currentConfig.passcode || '1301';
         if (adminHintInput) adminHintInput.value = currentConfig.hint || '';
         modalSetup.classList.add('active');
       });
@@ -2114,7 +2114,7 @@ Always stay the same graceful & awesome soul you are. Happy Birthday! 💖✨`,
       btnSavePass.addEventListener('click', async () => {
         const newCfg = {
           enabled: toggleEnabled ? toggleEnabled.checked : true,
-          passcode: (adminPassInput && adminPassInput.value.trim()) ? adminPassInput.value.trim() : '1234',
+          passcode: (adminPassInput && adminPassInput.value.trim()) ? adminPassInput.value.trim() : '1301',
           hint: adminHintInput ? adminHintInput.value.trim() : ''
         };
         await savePasscodeConfig(newCfg);
