@@ -199,14 +199,14 @@
 
 Aaj ke iss khaas din pe bas aapko dil se yeh yaad dilana tha ki aap mere liye kitni anmol dost aur special person hain.
 
-Waqt kitni jaldi guzar gaya na, par aapke saath bitaya hua har ek pal kisi fun storybook ke panno jaisa lagta hai. Wo random plans, chai aur snacks ki chuskiyan, ghanto tak chalne wali baatein, aur life ke sapno ke baare me sochna—aap meri sabse safe space aur favorite dost rahi hain.
+Waqt kitni jaldi guzar gaya, par aapke saath bitaya hua har ek pal kisi fun storybook ke panno jaisa lagta hai. Wo random plans, coffee , ghanto tak chalne wali baatein, aap meri sabse favorite dost rahi hain.
 
-Thank you hamesha meri baatein dhyan se sunne ke liye, har situation me saath dene ke liye, aur din ko itna bright banane ke liye.
+Thank you hamesha meri baatein dhyan se sunne ke liye, aur din ko itna bright banane ke liye.
 
 Rab kare aapka yeh naya saal dher saari kamiyabi, sukoon, sweet surprises aur wo saari khushiyan lekar aaye jo aap deserve karti hain. Kabhi yeh mat bhooliye ki aap kitni special aur valued dost hain.
 
 Always stay the same graceful & awesome soul you are. Happy Birthday! 💖✨`,
-    closing: 'Dher saari wishes aur dosti ke respect ke saath,\nAapka / Aapki Lifetime Best Friend 🌸'
+    closing: 'Dher saari wishes ,\nAapka Lifetime Friend 🌸'
   };
 
   const DEFAULT_TIMELINE = [
