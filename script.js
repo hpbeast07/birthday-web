@@ -154,7 +154,7 @@
       num: '01',
       emoji: '✨',
       title: 'Aapki Pyaari & Positive Smile',
-      desc: 'Jab aap hasti hain na, poora mahol ekdum khushnuma ho jata hai. Aapki hasi aur positive baatein sunke sabka mood ekdum fresh ho jata hai!'
+      desc: 'Jab aap hasti hain na, poora mahol ekdum khushnuma ho jata hai. Aapki hasi aur positive baatein sunke mood ekdum fresh ho jata hai!'
     },
     {
       id: 'reason_2',
@@ -168,24 +168,17 @@
       num: '03',
       emoji: '😂',
       title: 'Humari Masti & Shared Laughs',
-      desc: 'Ek doosre ko dekh kar hi hasi chhoot jaana kyunki baat sirf hum dono ko samajh aati hai! Aapke saath dosti me baat karne ka alag hi maza hai.'
+      desc: 'Ek doosre ko dekh kar hi hasi chhoot jaana!! Faltu ki bate and mastiii.'
     },
     {
       id: 'reason_4',
-      num: '04',
-      emoji: '🧸',
-      title: 'Aapka Comforting Support',
-      desc: 'Jab bhi koi baat ho, aapka kehna "Fikar mat kijiye, sab achhe se sambhal lenge" ekdum sukoon deta hai. Truly a wonderful and reliable friend!'
-    },
-    {
-      id: 'reason_5',
       num: '05',
       emoji: '🎀',
       title: 'Aapka Genuine & Real Nature',
-      desc: 'No fake drama, aap jaisi hain ekdum genuine aur down-to-earth hain. Hamesha aisi hi graceful, respectful aur awesome rahiye!'
+      desc: 'No fake drama, aap jaisi hain ekdum genuine hain. Hamesha aisi hi graceful, respectful aur awesome rahiye!'
     },
     {
-      id: 'reason_6',
+      id: 'reason_5',
       num: '06',
       emoji: '💖',
       title: 'Aapke Saath Har Moment Khushnuma Rehta Hai',
@@ -220,20 +213,13 @@ Always stay the same graceful & awesome soul you are. Happy Birthday! 💖✨`,
     {
       id: 'time_2',
       kissa: 'Kissa 2',
-      title: 'Chai-Boba Hangouts & Raat Ki Baatein 🧋',
-      story: 'Snacks khate huye ghanto tak baatein karna aur dher saari hasi mazak. Golden memories!',
+      title: 'Coffee Hangouts 🧋',
+      story: 'Coffee pite huye ghanto tak baatein karna aur dher saari hasi mazak. Golden memories!',
       tag: 'Inside Jokes 😂'
     },
     {
       id: 'time_3',
       kissa: 'Kissa 3',
-      title: 'Har Haal Me Ek Doosre Ka Saath 🌧️',
-      story: 'Jab bhi life me thoda low feel hua, ek doosre ko cheer up karna aur kehna: "Sab theek ho jayega". Best support system!',
-      tag: 'Safe Space 🫂'
-    },
-    {
-      id: 'time_4',
-      kissa: 'Kissa 4',
       title: 'Aaj Ka Din & Lifetime Memories 🎀',
       story: 'Aapke janamdin ka jashn aur aane wale saare future plans aur trips ke liye excited! Yeh dosti hamesha aisi hi bani rahe.',
       tag: 'Birthday Milestone 🎂'
@@ -241,7 +227,7 @@ Always stay the same graceful & awesome soul you are. Happy Birthday! 💖✨`,
   ];
 
   const DEFAULT_GIF_URL = 'assets/cute_birthday_bear.svg';
-  const DEFAULT_GIF_CAPTION = 'Party toh banti hai boss! 🥳🎂🎉';
+  const DEFAULT_GIF_CAPTION = 'Hey cutiee! 🥳🎂🎉';
 
   // ==========================================
   // 4. INDEXED DB HELPER (FALLBACK FOR LOCAL)
