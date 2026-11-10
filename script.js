@@ -1699,24 +1699,50 @@ Always stay the same graceful & awesome soul you are. Happy Birthday! 💖✨`,
     }
 
     if (btnSaveWish && wishInput) {
-      btnSaveWish.addEventListener('click', () => {
+    btnSaveWish.addEventListener('click', async () => {
+
         const text = wishInput.value.trim();
+
         if (!text) {
-          alert('Pehle apni secret wish jar me likhiye toh sahi! 🔮✨');
-          return;
+            alert('Pehle apni secret wish jar me likhiye! 🔮✨');
+            return;
         }
-        let wishes = [];
+
+        if (!supabase) {
+            alert('Supabase connection nahi hai!');
+            return;
+        }
+
+        btnSaveWish.disabled = true;
+
         try {
-          wishes = JSON.parse(localStorage.getItem(STORAGE_KEYS.WISHES_JAR) || '[]');
-        } catch (e) {}
-        wishes.push({ wish: text, id: 'wish_' + Date.now() });
-        localStorage.setItem(STORAGE_KEYS.WISHES_JAR, JSON.stringify(wishes));
-        wishInput.value = '';
-        launchConfettiBurst(60);
-        playSparkleSound();
-        openModalNotification('Wish Magic Jar Me Seal Ho Gayi! 🌟🔮', `"${text}"\n\nAapki secret wish sitaron ke paas safe ho chuki hai. Rab kare yeh jaldi se sach ho jaye! ✨`);
-      });
-    }
+            const { error } = await supabase
+                .from('birthday_wishes')
+                .insert({
+                    id: 'wish_' + Date.now(),
+                    wish: text
+                });
+
+            if (error) throw error;
+
+            wishInput.value = '';
+
+            launchConfettiBurst(60);
+            playSparkleSound();
+
+            openModalNotification(
+                'Wish Magic Jar Me Seal Ho Gayi! 🌟🔮',
+                `"${text}"\n\nAapki secret wish sitaron ke paas safe ho chuki hai. Rab kare yeh jaldi se sach ho jaye! ✨`
+            );
+
+        } catch (error) {
+            console.error('Wish save error:', error);
+            alert('Wish save nahi hui. Please dobara try karein!');
+        } finally {
+            btnSaveWish.disabled = false;
+        }
+    });
+}
   }
 
   // ==========================================
