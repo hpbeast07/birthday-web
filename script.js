@@ -293,7 +293,7 @@ Always stay the same graceful & awesome soul you are. Happy Birthday! 💖✨`,
   const DEFAULT_PASSCODE_CONFIG = {
     enabled: true,
     passcode: '1301',
-    hint: 'Hint: 1301 enter kijiye ya apna secret code 🎀'
+    hint: 'Hint: ni duga ehehehehe🎀'
   };
 
   async function getPasscodeConfig() {
