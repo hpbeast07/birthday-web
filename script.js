@@ -222,7 +222,7 @@ Always stay the same graceful & awesome soul you are. Happy Birthday! 💖✨`,
       kissa: 'Kissa 3',
       title: 'Aaj Ka Din & Lifetime Memories 🎀',
       story: 'Aapke janamdin ka jashn aur aane wale saare future plans aur trips ke liye excited! Yeh dosti hamesha aisi hi bani rahe.',
-      tag: 'Birthday Milestone 🎂'
+      tag: 'Birthday Milestone 🫶🏻🎂'
     }
   ];
 
