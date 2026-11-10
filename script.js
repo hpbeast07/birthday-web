@@ -208,18 +208,25 @@ Always stay the same graceful & awesome soul you are. Happy Birthday! 💖✨`,
   // 5. SUPABASE CLOUD SYNC FUNCTIONS
   // ==========================================
   async function getPhotos() {
-    if (supabase) {
-      try {
-        const { data, error } = await supabase.from('birthday_photos').select('*').order('created_at', { ascending: true });
-        if (!error && data && data.length > 0) {
-          return data;
-        }
-      } catch (err) {
-        console.warn('Supabase fetch error, fallback to local', err);
-      }
+    if (!supabase) {
+        console.error('Supabase connection unavailable!');
+        return [];
     }
-    return await getStoredPhotosLocal();
-  }
+
+    const { data, error } = await supabase
+        .from('birthday_photos')
+        .select('*')
+        .order('created_at', { ascending: true });
+
+    if (error) {
+        console.error('Supabase photos error:', error);
+        return [];
+    }
+
+    console.log('Supabase photos loaded:', data);
+
+    return data || [];
+}
 
   async function savePhoto(photo) {
     await savePhotoToDBLocal(photo);
