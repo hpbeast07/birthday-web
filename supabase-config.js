@@ -11,7 +11,7 @@
  */
 
 const SUPABASE_CONFIG = {
-  url: 'https://oaixpxmmatvetqnqosfj.supabase.co', // Aapka Project URL
-  anonKey: 'sb_publishable_Jfhw7BITUv8Del-OEDU5TQ_tVayv2eQ', // Aapki Anon Key
+  url: 'https://lfexoqgwdskdiisfkmlm.supabase.co', // Aapka Project URL
+  anonKey: 'sb_publishable_aveMJ4z0rH2wooVMbPi7WQ_3HjPTGQ6', // Aapki Anon Key
   bucketName: 'birthday-media'
 };
