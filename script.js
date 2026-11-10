@@ -77,14 +77,16 @@
     }
 
     if (copyShareBtn) {
-      copyShareBtn.addEventListener('click', () => {
+      copyShareBtn.addEventListener('click', async () => {
         const shareUrl = new URL(window.location.href);
         shareUrl.searchParams.set('view', '1');
+        const cfg = await getPasscodeConfig();
+        const passcodeInfo = cfg.enabled ? `\n\n🔐 Secret Passcode: ${cfg.passcode}\n(Birthday Girl ko link ke saath yeh passcode bhi bhej dijiyega taaki wo surprise unlock kar sakein! 🎀)` : '';
         navigator.clipboard.writeText(shareUrl.toString()).then(() => {
           launchConfettiBurst(50);
           playSparkleSound();
           openModalNotification('Clean Shareable Link Copy Ho Gaya! 🔗💖', 
-            `Aapka clean link copy ho chuka hai:\n\n${shareUrl.toString()}\n\nJab Birthday Girl yeh link kholegi, toh unhe koi bhi edit/delete button nahi dikhega—sirf ekdam clean, magical surprise website dikhegi! ✨`);
+            `Aapka clean link copy ho chuka hai:\n\n${shareUrl.toString()}${passcodeInfo}\n\nJab Birthday Girl yeh link kholegi, toh unhe koi bhi edit/delete button nahi dikhega—sirf ekdam clean, magical surprise website dikhegi! ✨`);
         }).catch(() => {
           prompt('Bhejne ke liye yeh clean link copy kar lijiye:', shareUrl.toString());
         });
@@ -373,6 +375,7 @@ Always stay the same graceful & awesome soul you are. Happy Birthday! 💖✨`,
   // 6. LOCAL STORAGE & CLOUD SETTINGS HELPERS
   // ==========================================
   const STORAGE_KEYS = {
+    PASSCODE_LOCK: 'jm_bday_passcode_lock',
     HERO_NAME: 'jm_bday_hero_name',
     HERO_WISH: 'jm_bday_hero_wish',
     LETTER: 'jm_bday_letter',
@@ -384,6 +387,33 @@ Always stay the same graceful & awesome soul you are. Happy Birthday! 💖✨`,
     GIF_CAPTION: 'jm_bday_gif_caption',
     INITIALIZED_RESPECT_V4: 'jm_bday_init_respect_v4'
   };
+
+
+  const DEFAULT_PASSCODE_CONFIG = {
+    enabled: true,
+    passcode: '1234',
+    hint: 'Hint: 1234 enter kijiye ya apna secret code 🎀'
+  };
+
+  async function getPasscodeConfig() {
+    if (supabase) {
+      try {
+        const { data } = await supabase.from('birthday_settings').select('value').eq('key', 'passcode_lock').single();
+        if (data && data.value) return data.value;
+      } catch (e) {}
+    }
+    const stored = localStorage.getItem(STORAGE_KEYS.PASSCODE_LOCK);
+    return stored ? JSON.parse(stored) : DEFAULT_PASSCODE_CONFIG;
+  }
+
+  async function savePasscodeConfig(cfg) {
+    localStorage.setItem(STORAGE_KEYS.PASSCODE_LOCK, JSON.stringify(cfg));
+    if (supabase) {
+      try {
+        await supabase.from('birthday_settings').upsert({ key: 'passcode_lock', value: cfg });
+      } catch (e) {}
+    }
+  }
 
   async function getLetterData() {
     if (supabase) {
@@ -1993,11 +2023,221 @@ Always stay the same graceful & awesome soul you are. Happy Birthday! 💖✨`,
     }
   }
 
+
   // ==========================================
+  // PASSCODE LOCK & SURPRISE VAULT SYSTEM
+  // ==========================================
+  async function setupPasscodeLockSystem() {
+    const lockScreen = document.getElementById('passcode-lock-screen');
+    const passcodeCard = document.getElementById('passcode-card-el');
+    const passcodeInput = document.getElementById('input-secret-passcode');
+    const toggleEyeBtn = document.getElementById('btn-toggle-passcode-visibility');
+    const unlockBtn = document.getElementById('btn-unlock-surprise');
+    const unlockForm = document.getElementById('form-passcode-unlock');
+    const hintBox = document.getElementById('passcode-hint-box');
+    const hintText = document.getElementById('passcode-hint-text');
+    const errorMsg = document.getElementById('passcode-error-msg');
+    const lockEmoji = document.getElementById('lock-icon-emoji');
+    const lockCircle = document.getElementById('lock-icon-circle');
+
+    // Admin Controls
+    const btnSetupPasscode = document.getElementById('btn-setup-passcode');
+    const adminPill = document.getElementById('admin-passcode-status-pill');
+    const modalSetup = document.getElementById('modal-setup-passcode');
+    const btnCloseModal = document.getElementById('btn-close-passcode-modal');
+    const toggleEnabled = document.getElementById('toggle-passcode-enabled');
+    const adminPassInput = document.getElementById('admin-passcode-input');
+    const adminHintInput = document.getElementById('admin-passcode-hint');
+    const btnSavePass = document.getElementById('btn-save-passcode-settings');
+    const btnTestLock = document.getElementById('btn-test-lock-screen');
+
+    let currentConfig = await getPasscodeConfig();
+
+    function updateAdminUI(cfg) {
+      if (adminPill) {
+        if (cfg.enabled) {
+          adminPill.textContent = cfg.passcode || '1234';
+          adminPill.style.color = 'var(--color-pink-deep)';
+        } else {
+          adminPill.textContent = 'Off';
+          adminPill.style.color = '#94A3B8';
+        }
+      }
+    }
+
+    updateAdminUI(currentConfig);
+
+    // Check if session is already unlocked
+    const isSessionUnlocked = sessionStorage.getItem('jm_bday_unlocked') === 'true';
+
+    if (!currentConfig.enabled || isSessionUnlocked) {
+      if (lockScreen) lockScreen.style.display = 'none';
+    } else {
+      if (lockScreen) {
+        lockScreen.style.display = 'flex';
+        if (currentConfig.hint && currentConfig.hint.trim()) {
+          hintText.textContent = currentConfig.hint.trim();
+          hintBox.style.display = 'flex';
+        } else {
+          hintBox.style.display = 'none';
+        }
+        setTimeout(() => { if (passcodeInput) passcodeInput.focus(); }, 150);
+      }
+    }
+
+    // Toggle Eye (Password Visibility)
+    if (toggleEyeBtn && passcodeInput) {
+      toggleEyeBtn.addEventListener('click', () => {
+        if (passcodeInput.type === 'password') {
+          passcodeInput.type = 'text';
+          toggleEyeBtn.textContent = '🙈';
+        } else {
+          passcodeInput.type = 'password';
+          toggleEyeBtn.textContent = '👁️';
+        }
+        passcodeInput.focus();
+      });
+    }
+
+    // Handle Unlock
+    async function attemptUnlock() {
+      if (!passcodeInput) return;
+      const entered = passcodeInput.value.trim();
+      currentConfig = await getPasscodeConfig();
+      const expected = (currentConfig.passcode || '1234').toString().trim();
+
+      if (!currentConfig.enabled || entered.toLowerCase() === expected.toLowerCase()) {
+        // SUCCESS UNLOCK!
+        if (errorMsg) errorMsg.style.display = 'none';
+        passcodeInput.classList.remove('input-error');
+        if (lockEmoji) lockEmoji.textContent = '🔓';
+        if (lockCircle) lockCircle.classList.add('unlocked-glow');
+        if (unlockBtn) {
+          unlockBtn.innerHTML = '<span>Unlocked! Khul Gaya 💖</span>';
+          unlockBtn.style.background = '#10B981';
+        }
+
+        launchConfettiBurst(80, window.innerWidth / 2, window.innerHeight / 2);
+        playSparkleSound();
+        sessionStorage.setItem('jm_bday_unlocked', 'true');
+
+        setTimeout(() => {
+          if (lockScreen) {
+            lockScreen.classList.add('fade-out');
+            setTimeout(() => {
+              lockScreen.style.display = 'none';
+              lockScreen.classList.remove('fade-out');
+              if (unlockBtn) {
+                unlockBtn.innerHTML = '<span>Surprise Unlock Kijiye</span> <span class="unlock-btn-icon">💖</span>';
+                unlockBtn.style.background = '';
+              }
+              if (lockEmoji) lockEmoji.textContent = '🔒';
+              if (lockCircle) lockCircle.classList.remove('unlocked-glow');
+            }, 600);
+          }
+        }, 450);
+      } else {
+        // ERROR WRONG PASSCODE
+        if (errorMsg) errorMsg.style.display = 'block';
+        passcodeInput.classList.add('input-error');
+        if (passcodeCard) {
+          passcodeCard.classList.remove('shake-card');
+          void passcodeCard.offsetWidth; // trigger reflow
+          passcodeCard.classList.add('shake-card');
+        }
+        passcodeInput.select();
+      }
+    }
+
+    if (unlockForm) {
+      unlockForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        attemptUnlock();
+      });
+    }
+    if (unlockBtn) {
+      unlockBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        attemptUnlock();
+      });
+    }
+
+    // Admin Modal Setup & Logic
+    if (btnSetupPasscode && modalSetup) {
+      btnSetupPasscode.addEventListener('click', async () => {
+        currentConfig = await getPasscodeConfig();
+        if (toggleEnabled) toggleEnabled.checked = currentConfig.enabled !== false;
+        if (adminPassInput) adminPassInput.value = currentConfig.passcode || '1234';
+        if (adminHintInput) adminHintInput.value = currentConfig.hint || '';
+        modalSetup.classList.add('active');
+      });
+    }
+
+    function closePasscodeModal() {
+      if (modalSetup) modalSetup.classList.remove('active');
+    }
+
+    if (btnCloseModal) btnCloseModal.addEventListener('click', closePasscodeModal);
+    if (modalSetup) {
+      modalSetup.addEventListener('click', (e) => {
+        if (e.target === modalSetup) closePasscodeModal();
+      });
+    }
+
+    if (btnSavePass) {
+      btnSavePass.addEventListener('click', async () => {
+        const newCfg = {
+          enabled: toggleEnabled ? toggleEnabled.checked : true,
+          passcode: (adminPassInput && adminPassInput.value.trim()) ? adminPassInput.value.trim() : '1234',
+          hint: adminHintInput ? adminHintInput.value.trim() : ''
+        };
+        await savePasscodeConfig(newCfg);
+        currentConfig = newCfg;
+        updateAdminUI(newCfg);
+        closePasscodeModal();
+        launchConfettiBurst(40);
+        openModalNotification('Passcode Settings Saved! 🔐💖',
+          `Aapka Passcode Lock successfully update ho gaya hai!\n\nStatus: ${newCfg.enabled ? 'ACTIVE ✅' : 'OFF'}\nSecret Passcode: ${newCfg.passcode}\nHint: ${newCfg.hint || 'None'}\n\nBirthday Girl jab website kholegi toh unhe yeh secret passcode enter karna hoga!`);
+      });
+    }
+
+    if (btnTestLock) {
+      btnTestLock.addEventListener('click', async () => {
+        closePasscodeModal();
+        sessionStorage.removeItem('jm_bday_unlocked');
+        currentConfig = await getPasscodeConfig();
+        if (passcodeInput) {
+          passcodeInput.value = '';
+          passcodeInput.classList.remove('input-error');
+        }
+        if (errorMsg) errorMsg.style.display = 'none';
+        if (lockEmoji) lockEmoji.textContent = '🔒';
+        if (lockCircle) lockCircle.classList.remove('unlocked-glow');
+        if (unlockBtn) {
+          unlockBtn.innerHTML = '<span>Surprise Unlock Kijiye</span> <span class="unlock-btn-icon">💖</span>';
+          unlockBtn.style.background = '';
+        }
+
+        if (lockScreen) {
+          lockScreen.style.display = 'flex';
+          if (currentConfig.hint && currentConfig.hint.trim()) {
+            hintText.textContent = currentConfig.hint.trim();
+            hintBox.style.display = 'flex';
+          } else {
+            hintBox.style.display = 'none';
+          }
+          setTimeout(() => { if (passcodeInput) passcodeInput.focus(); }, 150);
+        }
+      });
+    }
+  }
+
+    // ==========================================
   // 20. INIT ON DOM CONTENT LOADED
   // ==========================================
   window.addEventListener('DOMContentLoaded', async () => {
     initViewMode();
+    await setupPasscodeLockSystem();
     updateSupabaseStatusUI();
     await initSeedsIfNeeded();
     setupWelcomeScreen();
