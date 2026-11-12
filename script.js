@@ -493,6 +493,7 @@ Always stay the same graceful & awesome soul you are. Happy Birthday! 💖✨`,
   let musicTimeout = null;
   let currentMelodyNoteIndex = 0;
   let customAudioElement = null;
+  const DEFAULT_AUDIO_PATH = 'assets/birthday-song.aac';
 
   const NOTES = {
     'C4': 261.63, 'D4': 293.66, 'E4': 329.63, 'F4': 349.23, 'G4': 392.00, 'A4': 440.00, 'B4': 493.88,
@@ -579,22 +580,35 @@ Always stay the same graceful & awesome soul you are. Happy Birthday! 💖✨`,
 
   function startMusic() {
     const customAudioData = localStorage.getItem(STORAGE_KEYS.CUSTOM_AUDIO);
-    if (customAudioData) {
-      if (!customAudioElement) {
-        customAudioElement = new Audio(customAudioData);
-        customAudioElement.loop = true;
-      }
-      customAudioElement.muted = isMuted;
-      customAudioElement.play().catch(() => {});
-      isPlayingMusic = true;
-      updateMusicUI();
-      return;
+    const audioSrc = customAudioData || DEFAULT_AUDIO_PATH;
+
+    if (!customAudioElement) {
+      customAudioElement = new Audio(audioSrc);
+      customAudioElement.loop = true;
+    } else if (customAudioElement.src !== audioSrc && !customAudioElement.src.endsWith(audioSrc)) {
+      customAudioElement.src = audioSrc;
     }
 
-    isPlayingMusic = true;
-    getAudioContext();
-    scheduleMelodyLoop();
-    updateMusicUI();
+    customAudioElement.muted = isMuted;
+    const playPromise = customAudioElement.play();
+    if (playPromise !== undefined) {
+      playPromise
+        .then(() => {
+          isPlayingMusic = true;
+          updateMusicUI();
+        })
+        .catch(err => {
+          console.warn('Audio playback failed or was blocked by browser:', err);
+          // Fallback to Web Audio synthesizer if audio file cannot be played
+          isPlayingMusic = true;
+          getAudioContext();
+          scheduleMelodyLoop();
+          updateMusicUI();
+        });
+    } else {
+      isPlayingMusic = true;
+      updateMusicUI();
+    }
   }
 
   function pauseMusic() {
@@ -1753,6 +1767,14 @@ Always stay the same graceful & awesome soul you are. Happy Birthday! 💖✨`,
     const muteBtn = document.getElementById('btn-music-mute');
     const changeBtn = document.getElementById('btn-music-change');
     const audioInput = document.getElementById('custom-audio-input');
+    const titleEl = document.getElementById('music-title');
+
+    const customAudioData = localStorage.getItem(STORAGE_KEYS.CUSTOM_AUDIO);
+    if (customAudioData && titleEl) {
+      titleEl.innerText = 'Custom Song 🎵';
+    } else if (titleEl) {
+      titleEl.innerText = 'Her 💖';
+    }
 
     if (playBtn) playBtn.addEventListener('click', toggleMusic);
     if (muteBtn) muteBtn.addEventListener('click', toggleMute);
