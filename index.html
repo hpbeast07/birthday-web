@@ -235,10 +235,29 @@
           </button>
         </div>
 
-        <!-- Interactive 3-Tier Birthday Cake with Blowable Candles -->
+        <!-- Interactive Luxury 3D Birthday Cake with Blowable Candles -->
         <div class="cake-wrapper">
-          <div class="cake-container card-3d-tilt" title="Candles pe click karke bujha sakte hain!">
-            <!-- Candles Row -->
+          <!-- 3D Floating Sparkle Orbs & Aura -->
+          <div class="cake-sparkle-aura">
+            <span class="cake-orb orb-1">✨</span>
+            <span class="cake-orb orb-2">🌸</span>
+            <span class="cake-orb orb-3">💖</span>
+            <span class="cake-orb orb-4">⭐</span>
+            <span class="cake-orb orb-5">✨</span>
+          </div>
+
+          <div class="cake-container card-3d-tilt" id="interactive-cake-3d" title="Candles pe click karke bujha sakte hain ya cake rotate kijiye!">
+            <!-- Golden 3D Cake Topper -->
+            <div class="cake-topper-3d" title="Golden Birthday Topper">
+              <span class="topper-crown">👑</span>
+              <span class="topper-banner">Happy Birthday ✨</span>
+              <div class="topper-spikes">
+                <span class="topper-spike left"></span>
+                <span class="topper-spike right"></span>
+              </div>
+            </div>
+
+            <!-- Candles Row (Standing in 3D Arc) -->
             <div class="candles-row">
               <div class="candle" data-index="1">
                 <div class="candle-wick"></div>
@@ -267,46 +286,58 @@
               </div>
             </div>
 
-            <!-- Tier 3 (Top Tier) -->
+            <!-- Tier 3 (Top Tier - French Chantilly & Strawberries) -->
             <div class="cake-tier tier-top">
               <div class="cake-frosting frosting-top"></div>
+              <div class="tier-creams-row">
+                <div class="cream-rosette"></div>
+                <div class="cream-rosette"></div>
+                <div class="cream-rosette"></div>
+                <div class="cream-rosette"></div>
+              </div>
               <div class="cake-decorations">
-                <span class="strawberry">🍓</span>
-                <span class="strawberry">🌸</span>
-                <span class="strawberry">🍓</span>
+                <span class="strawberry" style="animation-delay: 0.1s;">🍓</span>
+                <span class="strawberry" style="animation-delay: 0.3s;">🌸</span>
+                <span class="strawberry" style="animation-delay: 0.5s;">🍓</span>
               </div>
             </div>
 
-            <!-- Tier 2 (Middle Tier) -->
+            <!-- Tier 2 (Middle Tier - Rose Macaron & Velvet Swag) -->
             <div class="cake-tier tier-middle">
               <div class="cake-frosting frosting-middle"></div>
-              <div class="cake-decorations" style="top: -6px;">
-                <span class="strawberry">✨</span>
-                <span class="strawberry">🍓</span>
-                <span class="strawberry">✨</span>
-                <span class="strawberry">🍓</span>
+              <div class="tier-pearls-trim"></div>
+              <div class="cake-decorations" style="top: -8px;">
+                <span class="strawberry" style="animation-delay: 0.2s;">✨</span>
+                <span class="strawberry" style="animation-delay: 0.4s;">🍓</span>
+                <span class="strawberry" style="animation-delay: 0.6s;">🧁</span>
+                <span class="strawberry" style="animation-delay: 0.8s;">🍓</span>
               </div>
             </div>
 
-            <!-- Tier 1 (Bottom Tier) -->
+            <!-- Tier 1 (Bottom Tier - Grand Vanilla Raspberry with Double Glaze Drips) -->
             <div class="cake-tier tier-bottom">
               <div class="cake-frosting frosting-bottom">
-                <div class="frosting-drip"></div>
-                <div class="frosting-drip" style="height: 18px;"></div>
-                <div class="frosting-drip"></div>
-                <div class="frosting-drip" style="height: 16px;"></div>
-                <div class="frosting-drip"></div>
+                <div class="frosting-drip drip-1"></div>
+                <div class="frosting-drip drip-2"></div>
+                <div class="frosting-drip drip-3"></div>
+                <div class="frosting-drip drip-4"></div>
+                <div class="frosting-drip drip-5"></div>
               </div>
+              <div class="tier-pearls-trim bottom-trim"></div>
             </div>
 
-            <!-- Cake Plate -->
+            <!-- Luxury Porcelain & Gold Cake Platter & Pedestal Base -->
             <div class="cake-plate"></div>
+            <div class="cake-pedestal-base"></div>
           </div>
 
           <!-- Cake Action Buttons -->
           <div class="cake-actions">
-            <button id="btn-blow-candles" class="btn-cake-action">
+            <button id="btn-blow-candles" class="btn-cake-action pulse-button">
               <span>💨</span> Wish Maangiye Aur Candles Bujhaiye
+            </button>
+            <button id="btn-sprinkle-sparkles" class="btn-cake-action secondary" title="Cake par magical sparkles chhidkiye!">
+              <span>✨</span> Magic Sparkles
             </button>
           </div>
 
@@ -537,7 +568,7 @@
       </div>
 
       <button id="btn-next-chapter" class="nav-chapter-btn next" title="Agla Page (Arrow Right)">
-        <span class="nav-btn-text">Agla Surprise</span> <span class="btn-arrow">→</span>
+        <span class="nav-btn-text">Agla</span> <span class="btn-arrow">→</span>
       </button>
     </div>
   </main>

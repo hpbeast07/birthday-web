@@ -689,143 +689,147 @@ section {
   transform: translateY(-2px);
 }
 
-/* INTERACTIVE BIRTHDAY CAKE */
+/* INTERACTIVE 3D BIRTHDAY CAKE & PATISSERIE SHOWCASE */
 .cake-wrapper {
   position: relative;
-  margin: 20px auto 40px;
+  margin: 32px auto 48px;
   display: flex;
   flex-direction: column;
   align-items: center;
+  perspective: 1200px;
+  perspective-origin: 50% 32%;
+}
+
+/* 3D Floating Fairy Sparkle Aura */
+.cake-sparkle-aura {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 360px;
+  height: 320px;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.cake-orb {
+  position: absolute;
+  font-size: 1.25rem;
+  opacity: 0.85;
+  filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.7));
+  animation: cakeOrbFloat 4s ease-in-out infinite alternate;
+}
+.cake-orb.orb-1 { top: 10%; left: 8%; animation-duration: 3.5s; font-size: 1.4rem; }
+.cake-orb.orb-2 { top: 25%; right: 6%; animation-duration: 4.2s; animation-delay: 0.8s; font-size: 1.2rem; }
+.cake-orb.orb-3 { top: 55%; left: 2%; animation-duration: 3.8s; animation-delay: 1.5s; font-size: 1.3rem; }
+.cake-orb.orb-4 { bottom: 20%; right: 4%; animation-duration: 4.5s; animation-delay: 0.4s; font-size: 1.1rem; }
+.cake-orb.orb-5 { top: 5%; right: 18%; animation-duration: 3.2s; animation-delay: 1.2s; font-size: 1.35rem; }
+
+@keyframes cakeOrbFloat {
+  0% { transform: translateY(0) scale(0.9) rotate(0deg); opacity: 0.5; }
+  50% { transform: translateY(-14px) scale(1.15) rotate(15deg); opacity: 0.95; }
+  100% { transform: translateY(6px) scale(1) rotate(-10deg); opacity: 0.6; }
 }
 
 .cake-container {
   position: relative;
-  width: 280px;
-  height: 240px;
+  width: 310px;
+  height: 285px;
   cursor: pointer;
+  transform-style: preserve-3d;
+  transform: rotateX(16deg) rotateY(-8deg);
+  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  animation: cakeFloat3D 6.5s ease-in-out infinite alternate;
+  z-index: 2;
 }
 
-/* Cake Plate */
-.cake-plate {
-  position: absolute;
-  bottom: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 290px;
-  height: 18px;
-  background: radial-gradient(ellipse at center, #FFFFFF 0%, #E8D7F1 80%, #C9A9E8 100%);
-  border-radius: 50%;
-  box-shadow: 0 10px 24px rgba(130, 80, 110, 0.2);
+.cake-container:hover {
+  transform: rotateX(19deg) rotateY(6deg) scale(1.035);
 }
 
-/* Tier 1 (Bottom) */
-.cake-tier.tier-bottom {
-  position: absolute;
-  bottom: 12px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 220px;
-  height: 70px;
-  background: linear-gradient(to right, #FFCCD8 0%, #FFE4EC 50%, #FFCCD8 100%);
-  border-radius: 12px 12px 6px 6px;
-  box-shadow: inset 0 -6px 12px rgba(220, 110, 140, 0.15), 0 6px 14px rgba(0,0,0,0.05);
+@keyframes cakeFloat3D {
+  0% {
+    transform: rotateX(15deg) rotateY(-9deg) translateY(0);
+  }
+  50% {
+    transform: rotateX(19deg) rotateY(5deg) translateY(-10px);
+  }
+  100% {
+    transform: rotateX(15deg) rotateY(-9deg) translateY(0);
+  }
 }
-.cake-frosting.frosting-bottom {
+
+/* Golden 3D Acrylic Cake Topper */
+.cake-topper-3d {
   position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 22px;
-  background: #FFFDF9;
-  border-radius: 12px 12px 18px 18px;
-  box-shadow: 0 4px 8px rgba(220, 110, 140, 0.15);
+  top: -46px;
+  left: 50%;
+  transform: translateX(-50%) translateZ(28px) rotateX(-12deg);
   display: flex;
-  justify-content: space-around;
-  padding: 0 10px;
+  flex-direction: column;
+  align-items: center;
+  z-index: 20;
+  pointer-events: none;
 }
-.frosting-drip {
-  width: 16px;
+
+.topper-crown {
+  font-size: 1.3rem;
+  filter: drop-shadow(0 3px 6px rgba(255, 180, 0, 0.5));
+  animation: crownBounce 2.5s infinite ease-in-out;
+}
+@keyframes crownBounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+
+.topper-banner {
+  background: linear-gradient(135deg, #FFFDE7 0%, #FFD54F 30%, #FFA000 65%, #FFE082 100%);
+  color: #5C3800;
+  font-family: var(--font-heading);
+  font-weight: 800;
+  font-size: 0.82rem;
+  letter-spacing: 0.4px;
+  padding: 4px 14px;
+  border-radius: 20px;
+  border: 1.5px solid #FFE082;
+  box-shadow: 0 6px 18px rgba(255, 179, 0, 0.45), inset 0 1px 2px #FFFFFF;
+  white-space: nowrap;
+  animation: topperShine 3s infinite ease-in-out;
+}
+
+@keyframes topperShine {
+  0%, 100% { filter: brightness(1); }
+  50% { filter: brightness(1.2) drop-shadow(0 0 10px rgba(255, 215, 0, 0.8)); }
+}
+
+.topper-spikes {
+  display: flex;
+  justify-content: space-between;
+  width: 50px;
+  margin-top: 1px;
+}
+.topper-spike {
+  width: 2px;
   height: 14px;
-  background: #FFFDF9;
-  border-radius: 0 0 10px 10px;
+  background: linear-gradient(to bottom, #FFA000, #FFE082);
+  border-radius: 1px;
 }
 
-/* Tier 2 (Middle) */
-.cake-tier.tier-middle {
-  position: absolute;
-  bottom: 78px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 165px;
-  height: 60px;
-  background: linear-gradient(to right, #E8D7F1 0%, #F5ECFA 50%, #E8D7F1 100%);
-  border-radius: 12px 12px 6px 6px;
-  box-shadow: inset 0 -5px 10px rgba(180, 130, 200, 0.18), 0 4px 10px rgba(0,0,0,0.04);
-}
-.cake-frosting.frosting-middle {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 20px;
-  background: #FFB3C6;
-  border-radius: 12px 12px 16px 16px;
-  box-shadow: 0 3px 6px rgba(220, 110, 140, 0.2);
-}
-
-/* Tier 3 (Top) */
-.cake-tier.tier-top {
-  position: absolute;
-  bottom: 134px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 110px;
-  height: 50px;
-  background: linear-gradient(to right, #FFB3C6 0%, #FFCCD8 50%, #FFB3C6 100%);
-  border-radius: 12px 12px 6px 6px;
-  box-shadow: inset 0 -4px 8px rgba(220, 110, 140, 0.18);
-}
-.cake-frosting.frosting-top {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 18px;
-  background: #FFFDF9;
-  border-radius: 12px 12px 14px 14px;
-  box-shadow: 0 3px 6px rgba(220, 110, 140, 0.2);
-}
-
-/* Strawberries / Rosettes on Top */
-.cake-decorations {
-  position: absolute;
-  top: -8px;
-  left: 0;
-  width: 100%;
-  display: flex;
-  justify-content: space-around;
-  padding: 0 8px;
-}
-.strawberry {
-  font-size: 1.1rem;
-  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.15));
-}
-
-/* Candles */
+/* 3D Animated Candles Row */
 .candles-row {
   position: absolute;
-  bottom: 182px;
+  bottom: 202px;
   left: 50%;
-  transform: translateX(-50%);
+  transform: translateX(-50%) translateZ(20px) rotateX(-14deg);
   display: flex;
-  gap: 16px;
-  z-index: 10;
+  gap: 15px;
+  z-index: 15;
 }
 
 .candle {
   position: relative;
   width: 10px;
-  height: 38px;
+  height: 40px;
   background: repeating-linear-gradient(
     45deg,
     #FFFFFF,
@@ -833,13 +837,27 @@ section {
     #FF8FAB 5px,
     #FF8FAB 10px
   );
-  border-radius: 3px 3px 0 0;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.12);
+  border-radius: 4px 4px 2px 2px;
+  box-shadow: -2px 3px 6px rgba(100, 30, 60, 0.25), inset 1.5px 0 2px rgba(255,255,255,0.85), inset -1.5px 0 2px rgba(0,0,0,0.12);
   cursor: pointer;
-  transition: transform 0.2s;
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
+
+.candle:nth-child(1), .candle:nth-child(5) {
+  height: 36px;
+  transform: translateY(3px);
+}
+.candle:nth-child(2), .candle:nth-child(4) {
+  height: 38px;
+  transform: translateY(1px);
+}
+.candle:nth-child(3) {
+  height: 42px;
+  transform: translateY(-2px);
+}
+
 .candle:hover {
-  transform: scale(1.15);
+  transform: scale(1.18);
 }
 
 .candle-wick {
@@ -849,21 +867,21 @@ section {
   transform: translateX(-50%);
   width: 2px;
   height: 8px;
-  background: #555;
+  background: #333;
   border-radius: 1px;
 }
 
 .candle-flame {
   position: absolute;
-  top: -22px;
+  top: -25px;
   left: 50%;
   transform: translateX(-50%);
-  width: 14px;
-  height: 20px;
-  background: radial-gradient(ellipse at bottom, #FFF 0%, #FFD166 40%, #EF476F 90%);
+  width: 15px;
+  height: 24px;
+  background: radial-gradient(ellipse at bottom, #FFFFFF 0%, #FFF59D 25%, #FFD166 50%, #EF476F 92%);
   border-radius: 50% 50% 35% 35% / 70% 70% 30% 30%;
-  box-shadow: 0 0 14px #FFD166, 0 0 28px #EF476F;
-  animation: flicker 1s infinite alternate ease-in-out;
+  box-shadow: 0 0 16px #FFD166, 0 0 32px #FF758F, 0 0 48px rgba(255, 180, 50, 0.7);
+  animation: flameDance3D 0.9s infinite alternate ease-in-out;
   transition: opacity 0.4s ease, transform 0.4s ease;
 }
 
@@ -873,7 +891,6 @@ section {
   pointer-events: none;
 }
 
-/* Candle smoke puff when blown out */
 .smoke-puff {
   position: absolute;
   top: -24px;
@@ -881,54 +898,299 @@ section {
   transform: translateX(-50%);
   width: 8px;
   height: 8px;
-  background: rgba(180, 180, 190, 0.6);
+  background: rgba(190, 190, 200, 0.65);
   border-radius: 50%;
   opacity: 0;
   pointer-events: none;
 }
+
 .candle.blown-out .smoke-puff {
   animation: smokeRise 1.6s ease-out forwards;
 }
 
 @keyframes smokeRise {
-  0% { opacity: 0.8; transform: translate(-50%, 0) scale(1); }
-  50% { opacity: 0.5; transform: translate(-70%, -20px) scale(2.2); }
-  100% { opacity: 0; transform: translate(-30%, -45px) scale(3.5); }
+  0% { opacity: 0.85; transform: translate(-50%, 0) scale(1); }
+  50% { opacity: 0.55; transform: translate(-70%, -22px) scale(2.4); }
+  100% { opacity: 0; transform: translate(-30%, -48px) scale(3.8); }
 }
 
-@keyframes flicker {
-  0% { transform: translateX(-50%) rotate(-2deg) scale(1); }
-  50% { transform: translateX(-48%) rotate(3deg) scale(1.08); }
-  100% { transform: translateX(-52%) rotate(-1deg) scale(0.95); }
+@keyframes flameDance3D {
+  0% { transform: translateX(-50%) rotate(-3deg) scale(1); filter: brightness(1); }
+  50% { transform: translateX(-47%) rotate(4deg) scale(1.09); filter: brightness(1.2); }
+  100% { transform: translateX(-53%) rotate(-2deg) scale(0.95); filter: brightness(0.96); }
+}
+
+/* Tier 3 (Top 3D Cylinder - Chantilly & Strawberry Crown) */
+.cake-tier.tier-top {
+  position: absolute;
+  bottom: 154px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 126px;
+  height: 54px;
+  background: linear-gradient(90deg, #F09CAE 0%, #FFB6C8 18%, #FFF0F4 48%, #FFCCD8 76%, #E5879C 100%);
+  border-radius: 10px 10px 16px 16px;
+  box-shadow: inset 0 -6px 12px rgba(190, 70, 100, 0.22);
+}
+
+.cake-tier.tier-top::before {
+  content: '';
+  position: absolute;
+  top: -11px;
+  left: 0;
+  width: 100%;
+  height: 22px;
+  border-radius: 50%;
+  background: radial-gradient(ellipse at 45% 35%, #FFFFFF 25%, #FFE4EC 70%, #FFCCD8 100%);
+  box-shadow: inset 0 2px 4px rgba(255, 255, 255, 0.95), 0 2px 4px rgba(0, 0, 0, 0.04);
+}
+
+.cake-frosting.frosting-top {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 18px;
+  background: #FFFDF9;
+  border-radius: 12px 12px 14px 14px;
+  box-shadow: 0 3px 6px rgba(190, 70, 100, 0.2), inset 0 2px 3px #FFFFFF;
+  z-index: 2;
+}
+
+/* Piped Cream Rosettes on Top Tier */
+.tier-creams-row {
+  position: absolute;
+  top: -5px;
+  left: 0;
+  width: 100%;
+  display: flex;
+  justify-content: space-around;
+  padding: 0 10px;
+  z-index: 3;
+}
+
+.cream-rosette {
+  width: 12px;
+  height: 10px;
+  background: #FFFDF9;
+  border-radius: 50% 50% 30% 30%;
+  box-shadow: 0 2px 4px rgba(180, 70, 100, 0.2), inset 0 1px 2px #FFFFFF;
+}
+
+/* 3D Strawberries & Toppings */
+.cake-decorations {
+  position: absolute;
+  top: -14px;
+  left: 0;
+  width: 100%;
+  display: flex;
+  justify-content: space-around;
+  padding: 0 8px;
+  z-index: 4;
+}
+
+.strawberry {
+  font-size: 1.2rem;
+  display: inline-block;
+  transform: translateZ(14px) rotateX(-12deg);
+  filter: drop-shadow(0 4px 8px rgba(120, 25, 55, 0.35));
+  transition: transform 0.25s ease;
+}
+
+.strawberry:hover {
+  transform: translateZ(20px) rotateX(-12deg) scale(1.25);
+}
+
+/* Tier 2 (Middle 3D Cylinder - Rose Velvet & Pearls) */
+.cake-tier.tier-middle {
+  position: absolute;
+  bottom: 90px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 186px;
+  height: 66px;
+  background: linear-gradient(90deg, #D4BFE6 0%, #E8D7F1 20%, #FAF4FC 48%, #E8D7F1 76%, #C7ACDF 100%);
+  border-radius: 10px 10px 18px 18px;
+  box-shadow: inset 0 -6px 14px rgba(150, 95, 175, 0.22), 0 6px 12px rgba(80, 40, 80, 0.06);
+}
+
+.cake-tier.tier-middle::before {
+  content: '';
+  position: absolute;
+  top: -13px;
+  left: 0;
+  width: 100%;
+  height: 26px;
+  border-radius: 50%;
+  background: radial-gradient(ellipse at 45% 35%, #FFFDF9 30%, #F5ECFA 70%, #DFCCF0 100%);
+  box-shadow: inset 0 2px 4px rgba(255, 255, 255, 0.9);
+}
+
+.cake-frosting.frosting-middle {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 22px;
+  background: linear-gradient(to right, #FFB3C6, #FFCCD8, #FFB3C6);
+  border-radius: 12px 12px 16px 16px;
+  box-shadow: 0 4px 8px rgba(190, 70, 100, 0.22), inset 0 2px 3px rgba(255, 255, 255, 0.7);
+  z-index: 2;
+}
+
+/* Piped Pearl Trim */
+.tier-pearls-trim {
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 100%;
+  height: 6px;
+  background: radial-gradient(circle, #FFFFFF 35%, #F0D5E6 70%, transparent 75%);
+  background-size: 8px 6px;
+  opacity: 0.85;
+}
+
+/* Tier 1 (Bottom 3D Cylinder - Vanilla Raspberry Double Glaze) */
+.cake-tier.tier-bottom {
+  position: absolute;
+  bottom: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 248px;
+  height: 76px;
+  background: linear-gradient(90deg, #E6879B 0%, #FFBCCD 20%, #FFF5F7 48%, #FFCCD8 76%, #E07F94 100%);
+  border-radius: 10px 10px 20px 20px;
+  box-shadow: inset 0 -8px 16px rgba(190, 75, 105, 0.24), 0 8px 18px rgba(90, 30, 50, 0.08);
+}
+
+.cake-tier.tier-bottom::before {
+  content: '';
+  position: absolute;
+  top: -16px;
+  left: 0;
+  width: 100%;
+  height: 32px;
+  border-radius: 50%;
+  background: radial-gradient(ellipse at 45% 35%, #FFFDF9 25%, #FFE4EC 75%, #FFBCCD 100%);
+  box-shadow: inset 0 2px 6px rgba(255, 255, 255, 0.9), 0 2px 5px rgba(0, 0, 0, 0.04);
+}
+
+.cake-frosting.frosting-bottom {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 25px;
+  background: #FFFDF9;
+  border-radius: 12px 12px 18px 18px;
+  box-shadow: 0 4px 10px rgba(190, 70, 100, 0.2), inset 0 2px 4px #FFFFFF;
+  display: flex;
+  justify-content: space-around;
+  padding: 0 10px;
+  z-index: 2;
+}
+
+.frosting-drip {
+  width: 16px;
+  background: #FFFDF9;
+  border-radius: 0 0 10px 10px;
+  box-shadow: 0 3px 6px rgba(190, 70, 100, 0.16);
+}
+.frosting-drip.drip-1 { height: 18px; }
+.frosting-drip.drip-2 { height: 26px; }
+.frosting-drip.drip-3 { height: 16px; }
+.frosting-drip.drip-4 { height: 23px; }
+.frosting-drip.drip-5 { height: 17px; }
+
+.tier-pearls-trim.bottom-trim {
+  bottom: 0;
+}
+
+/* Luxury Porcelain & Gold Cake Platter */
+.cake-plate {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 315px;
+  height: 26px;
+  background: radial-gradient(ellipse at center, #FFFFFF 0%, #FFF5F8 50%, #EFE5F6 85%, #FFD54F 100%);
+  border-radius: 50%;
+  border: 2px solid rgba(255, 213, 79, 0.7);
+  box-shadow: 0 22px 45px rgba(110, 35, 65, 0.3), 0 6px 14px rgba(251, 111, 146, 0.25), inset 0 2px 6px #FFFFFF;
+  z-index: 1;
+}
+
+/* Sculpted Pedestal Foot & Diffuse Contact Shadow */
+.cake-pedestal-base {
+  position: absolute;
+  bottom: -14px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 145px;
+  height: 16px;
+  background: linear-gradient(to right, #D8CEE2 0%, #FFFFFF 50%, #D8CEE2 100%);
+  border-radius: 50%;
+  box-shadow: 0 16px 32px rgba(90, 25, 55, 0.35);
+  z-index: 0;
+}
+
+.cake-pedestal-base::after {
+  content: '';
+  position: absolute;
+  bottom: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 270px;
+  height: 20px;
+  background: radial-gradient(ellipse at center, rgba(100, 30, 60, 0.38) 0%, rgba(100, 30, 60, 0.1) 50%, transparent 75%);
+  border-radius: 50%;
+  filter: blur(7px);
+  pointer-events: none;
 }
 
 /* Cake Action Buttons */
 .cake-actions {
   display: flex;
-  gap: 12px;
-  margin-top: 15px;
+  gap: 14px;
+  margin-top: 18px;
+  flex-wrap: wrap;
+  justify-content: center;
+  z-index: 5;
 }
 
 .btn-cake-action {
-  background: var(--color-pink-softest);
+  background: linear-gradient(135deg, #FFF0F5, #FFE4EC);
   color: var(--color-pink-deep);
-  border: 1.5px solid var(--color-pink-light);
+  border: 1.5px solid var(--color-pink-bubble);
   font-family: var(--font-body);
   font-weight: 700;
   font-size: 0.95rem;
-  padding: 10px 22px;
+  padding: 11px 24px;
   border-radius: var(--radius-full);
   cursor: pointer;
-  box-shadow: 0 4px 12px rgba(251, 111, 146, 0.15);
+  box-shadow: 0 4px 14px rgba(251, 111, 146, 0.18);
   transition: var(--transition-smooth);
   display: inline-flex;
   align-items: center;
   gap: 8px;
 }
 .btn-cake-action:hover {
-  background: var(--color-pink-pastel);
+  background: linear-gradient(135deg, #FF8FAB, #FB6F92);
+  color: white;
+  border-color: #FB6F92;
   transform: translateY(-2px);
-  box-shadow: 0 8px 18px rgba(251, 111, 146, 0.25);
+  box-shadow: 0 8px 22px rgba(251, 111, 146, 0.35);
+}
+
+.btn-cake-action.secondary {
+  background: white;
+  border-color: var(--color-pink-light);
+}
+.btn-cake-action.secondary:hover {
+  background: linear-gradient(135deg, #FFF0F5, #FFE8EE);
+  color: var(--color-pink-deep);
+  border-color: var(--color-pink-main);
 }
 
 .wish-made-banner {
@@ -1704,23 +1966,27 @@ body.view-mode .admin-mode-pill {
    6. FINAL SURPRISE & CELEBRATION SECTION 🎆
    ========================================================================== */
 .final-section {
-  padding: 100px 0 120px;
+  padding: 60px 0 140px;
   text-align: center;
   position: relative;
   background: radial-gradient(circle at center, rgba(255, 235, 245, 0.8) 0%, rgba(245, 230, 250, 0.4) 60%, transparent 100%);
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .final-card {
-  background: rgba(255, 255, 255, 0.88);
+  background: rgba(255, 255, 255, 0.92);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   border: 2px solid var(--color-pink-light);
-  box-shadow: 0 25px 65px rgba(220, 110, 150, 0.2);
+  box-shadow: 0 20px 55px rgba(220, 110, 150, 0.2);
   border-radius: var(--radius-lg);
-  padding: 55px 36px;
+  padding: 45px 30px;
   max-width: 780px;
+  width: 100%;
   margin: 0 auto;
   position: relative;
+  box-sizing: border-box;
 }
 
 .final-badge {
@@ -1736,11 +2002,12 @@ body.view-mode .admin-mode-pill {
 
 .final-heading {
   font-family: var(--font-heading);
-  font-size: 3.2rem;
+  font-size: clamp(1.8rem, 5vw, 3.2rem);
   font-weight: 800;
   color: var(--text-primary);
-  line-height: 1.25;
+  line-height: 1.28;
   margin-bottom: 16px;
+  word-break: break-word;
 }
 .final-heading span {
   background: linear-gradient(135deg, #FF6B8B 0%, #E0407B 50%, #9B51E0 100%);
@@ -1750,17 +2017,20 @@ body.view-mode .admin-mode-pill {
 
 .final-quote {
   font-family: var(--font-handwriting);
-  font-size: 2.1rem;
+  font-size: clamp(1.25rem, 3.8vw, 2.1rem);
   color: var(--color-pink-deep);
-  margin-bottom: 35px;
-  line-height: 1.4;
+  margin-bottom: 30px;
+  line-height: 1.45;
+  word-break: break-word;
 }
 
 .final-buttons-row {
   display: flex;
   justify-content: center;
-  gap: 16px;
+  gap: 14px;
   flex-wrap: wrap;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .btn-grand-celebrate {
@@ -1769,19 +2039,21 @@ body.view-mode .admin-mode-pill {
   border: none;
   font-family: var(--font-body);
   font-weight: 700;
-  font-size: 1.15rem;
-  padding: 16px 36px;
+  font-size: 1.05rem;
+  padding: 14px 32px;
   border-radius: var(--radius-full);
   cursor: pointer;
-  box-shadow: 0 12px 30px rgba(251, 111, 146, 0.4);
+  box-shadow: 0 10px 28px rgba(251, 111, 146, 0.4);
   transition: var(--transition-smooth);
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 10px;
+  max-width: 100%;
 }
 .btn-grand-celebrate:hover {
-  transform: translateY(-4px) scale(1.04);
-  box-shadow: 0 18px 40px rgba(251, 111, 146, 0.55);
+  transform: translateY(-4px) scale(1.03);
+  box-shadow: 0 16px 36px rgba(251, 111, 146, 0.55);
 }
 
 .btn-virtual-hug {
@@ -1790,15 +2062,17 @@ body.view-mode .admin-mode-pill {
   border: 2px solid var(--color-pink-light);
   font-family: var(--font-body);
   font-weight: 700;
-  font-size: 1.15rem;
-  padding: 15px 32px;
+  font-size: 1.05rem;
+  padding: 13px 28px;
   border-radius: var(--radius-full);
   cursor: pointer;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
   transition: var(--transition-smooth);
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 10px;
+  max-width: 100%;
 }
 .btn-virtual-hug:hover {
   background: var(--color-pink-softest);
@@ -1808,22 +2082,27 @@ body.view-mode .admin-mode-pill {
 
 /* Make a Secret Wish Jar Box */
 .wish-jar-card {
-  margin-top: 45px;
-  background: rgba(255, 245, 250, 0.9);
+  margin-top: 35px;
+  background: rgba(255, 245, 250, 0.92);
   border: 1.5px dashed var(--color-pink-light);
   border-radius: var(--radius-md);
-  padding: 24px;
+  padding: 22px 20px;
   max-width: 550px;
+  width: 100%;
   margin-left: auto;
   margin-right: auto;
+  box-sizing: border-box;
 }
 .wish-jar-input-row {
   display: flex;
   gap: 10px;
-  margin-top: 12px;
+  margin-top: 14px;
+  width: 100%;
+  box-sizing: border-box;
 }
 .wish-input {
   flex: 1;
+  min-width: 0;
   background: white;
   border: 1.5px solid var(--color-pink-light);
   border-radius: var(--radius-full);
@@ -1832,6 +2111,7 @@ body.view-mode .admin-mode-pill {
   font-size: 0.95rem;
   outline: none;
   transition: border-color 0.2s;
+  box-sizing: border-box;
 }
 .wish-input:focus {
   border-color: var(--color-pink-main);
@@ -1841,10 +2121,13 @@ body.view-mode .admin-mode-pill {
   color: white;
   border: none;
   border-radius: var(--radius-full);
-  padding: 10px 22px;
+  padding: 12px 24px;
   font-weight: 700;
   cursor: pointer;
   transition: var(--transition-gentle);
+  white-space: nowrap;
+  flex-shrink: 0;
+  box-sizing: border-box;
 }
 .btn-save-wish:hover {
   background: var(--color-pink-main);
@@ -2191,12 +2474,22 @@ textarea.form-control {
   }
   
   .floating-music-widget {
-    bottom: 14px;
-    right: 14px;
-    padding: 6px 12px;
+    top: 68px;
+    right: 12px;
+    bottom: auto;
+    padding: 5px 11px;
+    font-size: 0.78rem;
+    z-index: 998;
+    box-shadow: 0 6px 18px rgba(251, 111, 146, 0.22);
   }
   .music-title {
-    max-width: 90px;
+    max-width: 80px;
+    font-size: 0.74rem;
+  }
+  .music-disc {
+    width: 28px;
+    height: 28px;
+    font-size: 0.9rem;
   }
 }
 
@@ -2627,26 +2920,28 @@ body.vault-locked #passcode-lock-screen {
 /* FLOATING STORYBOOK NAVIGATOR DOCK */
 .storybook-navigator {
   position: fixed;
-  bottom: 22px;
+  bottom: 20px;
   left: 50%;
   transform: translateX(-50%);
   z-index: 10000;
   display: flex;
   align-items: center;
-  gap: 16px;
-  background: rgba(255, 253, 249, 0.94);
-  backdrop-filter: blur(18px);
-  -webkit-backdrop-filter: blur(18px);
-  border: 2px solid var(--color-pink-light);
+  justify-content: space-between;
+  gap: 14px;
+  background: rgba(255, 253, 249, 0.96);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1.5px solid rgba(251, 111, 146, 0.35);
   border-radius: 50px;
-  padding: 10px 22px;
-  box-shadow: 0 16px 45px rgba(110, 40, 70, 0.16), 0 4px 16px rgba(251, 111, 146, 0.25);
-  transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+  padding: 8px 18px;
+  box-shadow: 0 16px 45px rgba(110, 40, 70, 0.16), 0 4px 16px rgba(251, 111, 146, 0.22);
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
   user-select: none;
+  max-width: 95vw;
 }
 
 .storybook-navigator:hover {
-  box-shadow: 0 20px 55px rgba(110, 40, 70, 0.22), 0 6px 20px rgba(251, 111, 146, 0.35);
+  box-shadow: 0 20px 55px rgba(110, 40, 70, 0.24), 0 6px 22px rgba(251, 111, 146, 0.35);
   border-color: var(--color-pink-main);
 }
 
@@ -2660,20 +2955,22 @@ body.vault-locked .storybook-navigator {
   color: var(--color-pink-deep);
   font-family: inherit;
   font-weight: 700;
-  font-size: 0.9rem;
+  font-size: 0.88rem;
   border-radius: 30px;
   padding: 8px 18px;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 6px;
   transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
   box-shadow: 0 4px 12px rgba(251, 111, 146, 0.15);
   white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .nav-chapter-btn:hover:not(:disabled) {
-  transform: translateY(-2px) scale(1.05);
+  transform: translateY(-2px) scale(1.04);
   background: linear-gradient(135deg, #FF8FAB, #FB6F92);
   color: white;
   border-color: #FB6F92;
@@ -2681,7 +2978,7 @@ body.vault-locked .storybook-navigator {
 }
 
 .nav-chapter-btn:disabled {
-  opacity: 0.4;
+  opacity: 0.35;
   cursor: not-allowed;
   transform: none !important;
   box-shadow: none !important;
@@ -2696,7 +2993,7 @@ body.vault-locked .storybook-navigator {
 
 .nav-chapter-btn.next:hover {
   background: linear-gradient(135deg, #FF8FAB, #FB6F92);
-  transform: translateY(-2px) scale(1.06);
+  transform: translateY(-2px) scale(1.05);
 }
 
 .chapter-info-center {
@@ -2704,11 +3001,13 @@ body.vault-locked .storybook-navigator {
   flex-direction: column;
   align-items: center;
   gap: 4px;
+  min-width: 0;
+  flex: 1 1 auto;
 }
 
 .chapter-badge-pill {
   font-family: var(--font-heading);
-  font-size: 0.88rem;
+  font-size: 0.84rem;
   font-weight: 700;
   color: var(--color-pink-deep);
   display: flex;
@@ -2717,20 +3016,24 @@ body.vault-locked .storybook-navigator {
   background: #FFF0F5;
   border: 1px solid #FFD6E3;
   border-radius: 20px;
-  padding: 3px 14px;
+  padding: 3px 12px;
   white-space: nowrap;
-  letter-spacing: 0.3px;
+  letter-spacing: 0.2px;
+  max-width: 220px;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .chapter-dots-wrapper {
   display: flex;
   gap: 6px;
   align-items: center;
+  justify-content: center;
 }
 
 .chapter-dot {
-  width: 9px;
-  height: 9px;
+  width: 8px;
+  height: 8px;
   border-radius: 50%;
   background: #FFCCD8;
   cursor: pointer;
@@ -2744,8 +3047,8 @@ body.vault-locked .storybook-navigator {
 }
 
 .chapter-dot.active {
-  width: 24px;
-  border-radius: 12px;
+  width: 22px;
+  border-radius: 11px;
   background: var(--color-pink-deep);
   box-shadow: 0 0 10px rgba(251, 111, 146, 0.6);
   border-color: transparent;
@@ -2823,45 +3126,215 @@ body.vault-locked .storybook-navigator {
   box-shadow: 0 10px 28px rgba(217, 56, 91, 0.45);
 }
 
-/* RESPONSIVE DESIGN FOR STORYBOOK ON MOBILE PHONES */
+/* ==========================================================================
+   ADVANCED RESPONSIVE DESIGN FOR STORYBOOK ON MOBILE & TABLET
+   ========================================================================== */
 @media (max-width: 768px) {
+  /* Page structure */
   .storybook-page {
-    padding: 20px 12px 130px 12px;
-    min-height: calc(100vh - 65px);
+    padding: 16px 12px 140px 12px;
+    min-height: calc(100vh - 60px);
+    box-sizing: border-box;
   }
 
+  /* Floating Music Widget on Mobile: reposition to top-right below navbar so it never blocks the bottom dock */
+  .floating-music-widget {
+    top: 68px;
+    right: 12px;
+    bottom: auto;
+    padding: 5px 11px;
+    font-size: 0.78rem;
+    z-index: 998;
+    box-shadow: 0 6px 18px rgba(251, 111, 146, 0.22);
+  }
+  .music-title {
+    max-width: 80px;
+    font-size: 0.74rem;
+  }
+  .music-disc {
+    width: 28px;
+    height: 28px;
+    font-size: 0.9rem;
+  }
+
+  /* Sleek, Centered Bottom Navigator Dock */
   .storybook-navigator {
-    bottom: 14px;
-    width: calc(100% - 24px);
+    bottom: 12px;
+    width: calc(100% - 20px);
     max-width: 440px;
-    padding: 8px 12px;
-    gap: 8px;
+    padding: 6px 10px;
+    gap: 6px;
     justify-content: space-between;
+    border-radius: 40px;
   }
 
   .nav-chapter-btn {
-    padding: 8px 12px;
-    font-size: 0.82rem;
+    padding: 7px 12px;
+    font-size: 0.8rem;
+    gap: 4px;
+    border-radius: 20px;
   }
 
   .chapter-badge-pill {
-    font-size: 0.76rem;
-    padding: 2px 10px;
-    max-width: 170px;
+    font-size: 0.73rem;
+    padding: 2px 8px;
+    max-width: 135px;
     overflow: hidden;
     text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   .chapter-dots-wrapper {
-    gap: 4px;
+    gap: 3px;
   }
 
   .chapter-dot {
-    width: 7px;
-    height: 7px;
+    width: 6px;
+    height: 6px;
   }
 
   .chapter-dot.active {
-    width: 16px;
+    width: 14px;
+    border-radius: 7px;
+  }
+
+  /* 3D Birthday Cake on Mobile */
+  .cake-wrapper {
+    margin: 15px auto 30px;
+    perspective: 900px;
+  }
+  .cake-sparkle-aura {
+    width: 280px;
+    height: 260px;
+  }
+  .cake-container {
+    transform: rotateX(15deg) rotateY(-6deg) scale(0.82);
+    transform-origin: center bottom;
+    margin: 0 auto;
+  }
+  .cake-actions {
+    flex-direction: row;
+    flex-wrap: wrap;
+    width: 100%;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 14px;
+  }
+  .btn-cake-action {
+    font-size: 0.88rem;
+    padding: 10px 18px;
+  }
+
+  /* Last Page (Grand Finale) Mobile Layout */
+  .final-section {
+    padding: 10px 0 140px;
+  }
+
+  .final-card {
+    padding: 28px 14px;
+    border-radius: 20px;
+    max-width: 100%;
+    margin: 0 auto;
+  }
+
+  .final-badge {
+    font-size: 2.2rem;
+    margin-bottom: 8px;
+  }
+
+  .final-heading {
+    font-size: 1.7rem;
+    line-height: 1.25;
+    margin-bottom: 12px;
+  }
+
+  .final-quote {
+    font-size: 1.22rem;
+    line-height: 1.4;
+    margin-bottom: 22px;
+  }
+
+  .final-buttons-row {
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+  }
+
+  .btn-grand-celebrate,
+  .btn-virtual-hug {
+    width: 100%;
+    justify-content: center;
+    padding: 13px 18px;
+    font-size: 0.95rem;
+    box-sizing: border-box;
+  }
+
+  .wish-jar-card {
+    padding: 18px 12px;
+    margin-top: 22px;
+    width: 100%;
+    border-radius: 16px;
+  }
+
+  .wish-jar-input-row {
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+  }
+
+  .wish-input {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 11px 16px;
+    font-size: 0.9rem;
+  }
+
+  .btn-save-wish {
+    width: 100%;
+    padding: 12px 18px;
+    font-size: 0.92rem;
+    text-align: center;
+    justify-content: center;
+  }
+}
+
+/* Extra Small Phones (< 380px) */
+@media (max-width: 380px) {
+  .storybook-navigator {
+    padding: 5px 6px;
+    gap: 4px;
+    bottom: 10px;
+  }
+
+  .nav-chapter-btn {
+    padding: 6px 9px;
+    font-size: 0.74rem;
+  }
+
+  .chapter-badge-pill {
+    font-size: 0.68rem;
+    padding: 2px 6px;
+    max-width: 100px;
+  }
+
+  .chapter-dot {
+    width: 5px;
+    height: 5px;
+  }
+
+  .chapter-dot.active {
+    width: 11px;
+  }
+
+  .cake-container {
+    transform: rotateX(15deg) rotateY(-6deg) scale(0.74);
+  }
+
+  .final-card {
+    padding: 22px 10px;
+  }
+
+  .final-heading {
+    font-size: 1.45rem;
   }
 }

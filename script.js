@@ -1235,12 +1235,13 @@ Always stay the same graceful & awesome soul you are. Happy Birthday! 💖✨`,
       // Update buttons
       if (prevBtn) {
         prevBtn.disabled = currentChapterIndex === 0;
+        prevBtn.innerHTML = '<span class="btn-arrow">←</span> <span class="nav-btn-text">Pichla</span>';
       }
       if (nextBtn) {
         if (currentChapterIndex === CHAPTERS.length - 1) {
           nextBtn.innerHTML = '<span class="nav-btn-text">Celebrate</span> <span>🎉</span>';
         } else {
-          nextBtn.innerHTML = '<span class="nav-btn-text">Agla Surprise</span> <span class="btn-arrow">→</span>';
+          nextBtn.innerHTML = '<span class="nav-btn-text">Agla</span> <span class="btn-arrow">→</span>';
         }
       }
 
@@ -1349,39 +1350,6 @@ Always stay the same graceful & awesome soul you are. Happy Birthday! 💖✨`,
         }
       }
     });
-
-    // Touch Swipe Navigation for Mobile
-    let touchStartX = 0;
-    let touchStartY = 0;
-    window.addEventListener('touchstart', (e) => {
-      if (e.touches.length === 1) {
-        touchStartX = e.touches[0].clientX;
-        touchStartY = e.touches[0].clientY;
-      }
-    }, { passive: true });
-
-    window.addEventListener('touchend', (e) => {
-      if (e.changedTouches.length === 1) {
-        const touchEndX = e.changedTouches[0].clientX;
-        const touchEndY = e.changedTouches[0].clientY;
-        const diffX = touchEndX - touchStartX;
-        const diffY = touchEndY - touchStartY;
-
-        if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 65) {
-          if (diffX < 0) {
-            // Swipe Left -> Next Chapter
-            if (currentChapterIndex < CHAPTERS.length - 1) {
-              goToChapter(currentChapterIndex + 1, 'forward');
-            }
-          } else {
-            // Swipe Right -> Prev Chapter
-            if (currentChapterIndex > 0) {
-              goToChapter(currentChapterIndex - 1, 'backward');
-            }
-          }
-        }
-      }
-    }, { passive: true });
 
     updateNavigatorUI();
   }
@@ -1521,6 +1489,20 @@ Always stay the same graceful & awesome soul you are. Happy Birthday! 💖✨`,
           if (wishBanner) wishBanner.style.display = 'none';
           btnBlow.innerHTML = '<span>💨</span> Wish Maangiye Aur Candles Bujhaiye';
           playSparkleSound();
+        }
+      });
+    }
+
+    // Magic Sparkles Button
+    const btnSprinkle = document.getElementById('btn-sprinkle-sparkles');
+    if (btnSprinkle) {
+      btnSprinkle.addEventListener('click', () => {
+        const cakeEl = document.getElementById('interactive-cake-3d') || btnSprinkle;
+        const rect = cakeEl.getBoundingClientRect();
+        launchConfettiBurst(60, rect.left + rect.width / 2, rect.top + rect.height * 0.4);
+        playSparkleSound();
+        if (typeof window.triggerHeartBurst === 'function') {
+          window.triggerHeartBurst(rect.left + rect.width / 2, rect.top + rect.height * 0.4);
         }
       });
     }
