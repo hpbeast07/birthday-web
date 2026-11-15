@@ -318,6 +318,28 @@ Always stay the same graceful & awesome soul you are. Happy Birthday! 💖✨`,
     }
   }
 
+  // Allowed public interaction for Birthday Girl to like photos
+  async function updatePhotoLikes(id, likes) {
+    try {
+      const db = await dbPromise;
+      const tx = db.transaction(STORE_PHOTOS, 'readwrite');
+      const store = tx.objectStore(STORE_PHOTOS);
+      const req = store.get(id);
+      req.onsuccess = () => {
+        const item = req.result;
+        if (item) {
+          item.likes = likes;
+          store.put(item);
+        }
+      };
+      if (supabase) {
+        await supabase.from('birthday_photos').update({ likes }).eq('id', id);
+      }
+    } catch (e) {
+      console.warn('Could not update likes:', e);
+    }
+  }
+
   // ==========================================
   // CRYPTOGRAPHIC VAULT SECURITY (SHA-256 + SALT)
   // ==========================================
@@ -1160,23 +1182,293 @@ Always stay the same graceful & awesome soul you are. Happy Birthday! 💖✨`,
   });
 
   // ==========================================
-  // 9. WELCOME SCREEN INTERACTION
+  // 9. STORYBOOK MULTI-PAGE & 3D ANIMATION ENGINE 🎀📖
   // ==========================================
+  const CHAPTERS = [
+    { id: 'welcome-screen', title: 'The Surprise Gift Box', icon: '🎁' },
+    { id: 'hero-section', title: 'The Birthday Cake & Wishes', icon: '🎂' },
+    { id: 'gif-section', title: 'The Birthday Mood & Vibes', icon: '🧸' },
+    { id: 'gallery-section', title: 'Humari Pyaari Yaadein (Polaroids)', icon: '📸' },
+    { id: 'reasons-section', title: 'Khaas Baatein Jo Aapko Special Banati Hain', icon: '✨' },
+    { id: 'letter-section', title: 'Aapke Liye Ek Secret Letter', icon: '💌' },
+    { id: 'timeline-section', title: 'Dosti Ke Pyaare Chapters', icon: '📖' },
+    { id: 'final-section', title: 'Grand Finale & Fireworks Wishing Well', icon: '🎆' }
+  ];
+
+  let currentChapterIndex = 0;
+  let isTransitioningChapter = false;
+
+  function initStorybookNavigation() {
+    const prevBtn = document.getElementById('btn-prev-chapter');
+    const nextBtn = document.getElementById('btn-next-chapter');
+    const dotsContainer = document.getElementById('chapter-dots-wrapper');
+    const badgeIcon = document.getElementById('chapter-badge-icon');
+    const badgeTitle = document.getElementById('chapter-badge-title');
+
+    // Build chapter dots
+    if (dotsContainer) {
+      dotsContainer.innerHTML = '';
+      CHAPTERS.forEach((ch, idx) => {
+        const dot = document.createElement('div');
+        dot.className = `chapter-dot ${idx === currentChapterIndex ? 'active' : ''}`;
+        dot.title = `${ch.icon} ${ch.title}`;
+        dot.addEventListener('click', () => {
+          goToChapter(idx);
+        });
+        dotsContainer.appendChild(dot);
+      });
+    }
+
+    function updateNavigatorUI() {
+      const ch = CHAPTERS[currentChapterIndex];
+      if (badgeIcon) badgeIcon.textContent = ch.icon;
+      if (badgeTitle) badgeTitle.textContent = `Ch ${currentChapterIndex + 1}/${CHAPTERS.length}: ${ch.title}`;
+
+      // Update dots
+      if (dotsContainer) {
+        const dots = dotsContainer.querySelectorAll('.chapter-dot');
+        dots.forEach((d, i) => {
+          d.classList.toggle('active', i === currentChapterIndex);
+        });
+      }
+
+      // Update buttons
+      if (prevBtn) {
+        prevBtn.disabled = currentChapterIndex === 0;
+      }
+      if (nextBtn) {
+        if (currentChapterIndex === CHAPTERS.length - 1) {
+          nextBtn.innerHTML = '<span class="nav-btn-text">Celebrate</span> <span>🎉</span>';
+        } else {
+          nextBtn.innerHTML = '<span class="nav-btn-text">Agla Surprise</span> <span class="btn-arrow">→</span>';
+        }
+      }
+
+      // Update active state in top header nav
+      const navLinks = document.querySelectorAll('.nav-links .nav-link');
+      navLinks.forEach((nl) => {
+        const targetChapter = nl.getAttribute('data-chapter');
+        if (targetChapter !== null) {
+          nl.classList.toggle('active', parseInt(targetChapter, 10) === currentChapterIndex);
+        }
+      });
+    }
+
+    window.goToChapter = function(targetIndex, direction = null) {
+      if (isTransitioningChapter) return;
+      if (targetIndex < 0 || targetIndex >= CHAPTERS.length) return;
+      if (targetIndex === currentChapterIndex) return;
+
+      isTransitioningChapter = true;
+      const prevIndex = currentChapterIndex;
+      currentChapterIndex = targetIndex;
+
+      const isForward = direction ? direction === 'forward' : (targetIndex > prevIndex);
+
+      const oldEl = document.getElementById(CHAPTERS[prevIndex].id);
+      const newEl = document.getElementById(CHAPTERS[targetIndex].id);
+
+      // Play soft sparkle sound
+      playSparkleSound();
+
+      if (oldEl) {
+        oldEl.classList.remove('active-page', 'page-flip-backward');
+        oldEl.style.display = 'none';
+      }
+
+      if (newEl) {
+        newEl.style.display = 'flex';
+        newEl.classList.remove('page-flip-backward');
+        if (!isForward) {
+          newEl.classList.add('page-flip-backward');
+        }
+        void newEl.offsetWidth; // trigger reflow
+        newEl.classList.add('active-page');
+      }
+
+      updateNavigatorUI();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+
+      // If opening Finale chapter (7), auto trigger fireworks!
+      if (targetIndex === 7) {
+        setTimeout(() => {
+          launchConfettiBurst(80, window.innerWidth / 2, window.innerHeight * 0.4);
+        }, 300);
+      }
+
+      setTimeout(() => {
+        isTransitioningChapter = false;
+        init3DCardTilt();
+      }, 650);
+    };
+
+    if (prevBtn) {
+      prevBtn.addEventListener('click', () => {
+        if (currentChapterIndex > 0) {
+          goToChapter(currentChapterIndex - 1, 'backward');
+        }
+      });
+    }
+
+    if (nextBtn) {
+      nextBtn.addEventListener('click', () => {
+        if (currentChapterIndex < CHAPTERS.length - 1) {
+          goToChapter(currentChapterIndex + 1, 'forward');
+        } else {
+          // If on last chapter, celebratory fireworks explosion
+          launchGrandFireworks();
+          launchConfettiBurst(120);
+        }
+      });
+    }
+
+    // Top Navigation Links click handling
+    const allNavLinks = document.querySelectorAll('.nav-link, .btn-icon-soft');
+    allNavLinks.forEach(link => {
+      link.addEventListener('click', (e) => {
+        const chapterIdx = link.getAttribute('data-chapter');
+        if (chapterIdx !== null) {
+          e.preventDefault();
+          goToChapter(parseInt(chapterIdx, 10));
+          const mobileNav = document.getElementById('nav-links');
+          if (mobileNav) mobileNav.classList.remove('show');
+        }
+      });
+    });
+
+    // Keyboard Arrow navigation: Left (prev), Right (next)
+    window.addEventListener('keydown', (e) => {
+      if (['INPUT', 'TEXTAREA'].includes(document.activeElement?.tagName)) return;
+      if (e.key === 'ArrowRight') {
+        if (currentChapterIndex < CHAPTERS.length - 1) {
+          goToChapter(currentChapterIndex + 1, 'forward');
+        }
+      } else if (e.key === 'ArrowLeft') {
+        if (currentChapterIndex > 0) {
+          goToChapter(currentChapterIndex - 1, 'backward');
+        }
+      }
+    });
+
+    // Touch Swipe Navigation for Mobile
+    let touchStartX = 0;
+    let touchStartY = 0;
+    window.addEventListener('touchstart', (e) => {
+      if (e.touches.length === 1) {
+        touchStartX = e.touches[0].clientX;
+        touchStartY = e.touches[0].clientY;
+      }
+    }, { passive: true });
+
+    window.addEventListener('touchend', (e) => {
+      if (e.changedTouches.length === 1) {
+        const touchEndX = e.changedTouches[0].clientX;
+        const touchEndY = e.changedTouches[0].clientY;
+        const diffX = touchEndX - touchStartX;
+        const diffY = touchEndY - touchStartY;
+
+        if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 65) {
+          if (diffX < 0) {
+            // Swipe Left -> Next Chapter
+            if (currentChapterIndex < CHAPTERS.length - 1) {
+              goToChapter(currentChapterIndex + 1, 'forward');
+            }
+          } else {
+            // Swipe Right -> Prev Chapter
+            if (currentChapterIndex > 0) {
+              goToChapter(currentChapterIndex - 1, 'backward');
+            }
+          }
+        }
+      }
+    }, { passive: true });
+
+    updateNavigatorUI();
+  }
+
+  // 3D CARD PARALLAX TILT ENGINE
+  function init3DCardTilt() {
+    const cards = document.querySelectorAll('.card-3d-tilt, .polaroid-card, .reason-card');
+    cards.forEach(card => {
+      if (card.dataset.tiltBound) return;
+      card.dataset.tiltBound = 'true';
+
+      card.addEventListener('mousemove', (e) => {
+        const rect = card.getBoundingClientRect();
+        const x = e.clientX - rect.left - rect.width / 2;
+        const y = e.clientY - rect.top - rect.height / 2;
+        const rotateX = -(y / (rect.height / 2)) * 10;
+        const rotateY = (x / (rect.width / 2)) * 10;
+        card.style.transform = `perspective(1100px) rotateX(${rotateX.toFixed(2)}deg) rotateY(${rotateY.toFixed(2)}deg) scale3d(1.025, 1.025, 1.025)`;
+      });
+
+      card.addEventListener('mouseleave', () => {
+        card.style.transform = '';
+      });
+    });
+  }
+
+  // INTERACTIVE CURSOR SPARKLES TRAIL
+  function initCursorSparkles() {
+    let lastTime = 0;
+    const SPARKLE_CHARS = ['✨', '🌸', '💖', '⭐', '🧁', '🎀'];
+
+    function spawnSparkle(x, y) {
+      const now = Date.now();
+      if (now - lastTime < 45) return;
+      lastTime = now;
+
+      const sparkle = document.createElement('span');
+      sparkle.className = 'cursor-sparkle';
+      sparkle.textContent = SPARKLE_CHARS[Math.floor(Math.random() * SPARKLE_CHARS.length)];
+      sparkle.style.left = `${x}px`;
+      sparkle.style.top = `${y}px`;
+      document.body.appendChild(sparkle);
+
+      setTimeout(() => sparkle.remove(), 750);
+    }
+
+    window.addEventListener('mousemove', (e) => {
+      spawnSparkle(e.clientX, e.clientY);
+    });
+
+    window.addEventListener('touchmove', (e) => {
+      if (e.touches && e.touches[0]) {
+        spawnSparkle(e.touches[0].clientX, e.touches[0].clientY);
+      }
+    }, { passive: true });
+  }
+
+  // FLOATING HEART BURST FUNCTION (For Polaroids or Buttons)
+  window.triggerHeartBurst = function(x, y) {
+    const HEARTS = ['💖', '❤️', '💕', '✨', '🌸'];
+    for (let i = 0; i < 7; i++) {
+      const heart = document.createElement('span');
+      heart.className = 'floating-burst-heart';
+      heart.textContent = HEARTS[Math.floor(Math.random() * HEARTS.length)];
+      heart.style.left = `${x || window.innerWidth / 2}px`;
+      heart.style.top = `${y || window.innerHeight / 2}px`;
+      const dx = (Math.random() - 0.5) * 120;
+      const rot = (Math.random() - 0.5) * 60;
+      heart.style.setProperty('--dx', `${dx}px`);
+      heart.style.setProperty('--rot', `${rot}deg`);
+      document.body.appendChild(heart);
+      setTimeout(() => heart.remove(), 1100);
+    }
+  };
+
   function setupWelcomeScreen() {
-    const welcomeScreen = document.getElementById('welcome-screen');
     const openBtn = document.getElementById('btn-open-surprise');
     const giftBox = document.getElementById('gift-box-wrapper');
 
     function openSurprise() {
-      if (!welcomeScreen || welcomeScreen.classList.contains('hidden')) return;
       launchConfettiBurst(120, window.innerWidth / 2, window.innerHeight / 2);
       playSparkleSound();
       startMusic();
-
-      welcomeScreen.classList.add('hidden');
-      setTimeout(() => {
-        welcomeScreen.style.display = 'none';
-      }, 900);
+      // Smoothly transition to Chapter 1 (Cake)
+      if (window.goToChapter) {
+        window.goToChapter(1, 'forward');
+      }
     }
 
     if (openBtn) openBtn.addEventListener('click', openSurprise);
@@ -1403,15 +1695,19 @@ Always stay the same graceful & awesome soul you are. Happy Birthday! 💖✨`,
         openLightbox(photo.src, photo.caption);
       });
 
-      // Like button
+      // Like button (Allowed for Birthday Girl / Viewers)
       const likeBtn = card.querySelector('.btn-like-heart');
       likeBtn.addEventListener('click', async (e) => {
         e.stopPropagation();
         photo.likes = (photo.likes || 0) + 1;
-        await savePhoto(photo);
+        await updatePhotoLikes(photo.id, photo.likes);
         likeBtn.innerHTML = `💖 <span class="like-count" style="font-size: 0.75rem;">${photo.likes}</span>`;
         likeBtn.classList.add('liked');
-        launchConfettiBurst(15, e.clientX, e.clientY);
+        if (window.triggerHeartBurst) {
+          window.triggerHeartBurst(e.clientX, e.clientY);
+        }
+        playSparkleSound();
+        launchConfettiBurst(20, e.clientX, e.clientY);
         setTimeout(() => likeBtn.classList.remove('liked'), 400);
       });
 
@@ -2315,6 +2611,11 @@ Always stay the same graceful & awesome soul you are. Happy Birthday! 💖✨`,
     setupMusicPlayer();
     setupResetButton();
     setupMobileNav();
+
+    // 3D Storybook & Animation Engines
+    initStorybookNavigation();
+    init3DCardTilt();
+    initCursorSparkles();
   }
 
   // ==========================================

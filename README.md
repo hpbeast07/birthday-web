@@ -16,6 +16,13 @@ Yeh website 100% secure aur ready hai! Isme do-level security system implement k
    - Default Admin PIN: **`admin1311`** (Aap ise Admin Bar me **`🔑 Change Admin PIN`** button se jab chahein badal sakte hain).
    - Saare save functions cryptographically protected hain—DevTools se bhi koi bypass nahi kar sakta!
 
+3. **📖 Level 3: 3D Animated Interactive Storybook Experience**:
+   - Har part (Gift Unboxing, Cake, Mood GIF, Yaadein, Khaas Baatein, Letter, Kisse, Finale) ab ek **dedicated, 3D animated page/chapter** hai!
+   - Niche floating **Storybook Navigator** diya gaya hai (`⬅️ Pichla`, `Agla Surprise ➡️`, aur 8 chapter dots).
+   - **3D Card Parallax Tilt**: Polaroids, Gift Box, Cake aur Letter par mouse le jaane par wo 3D angle me tilt hote hain!
+   - **Interactive Micro-Animations**: Cursor sparkle trail, Polaroid heart burst (+1 reaction), 3D wax seal opening, blowable candles with smoke, aur live canvas fireworks!
+   - **Mobile Gestures**: Mobile par Left/Right swipe karke chapters palat sakte hain! Keyboard par Left/Right arrow keys se bhi pages flip hote hain.
+
 ---
 
 ## 🔒 1. Non-Editable (View-Only) Mode Kaise Kaam Karta Hai?
