@@ -111,10 +111,10 @@
         <li><a href="#welcome-screen" class="nav-link" data-chapter="0">🎁 Welcome</a></li>
         <li><a href="#hero-section" class="nav-link" data-chapter="1">🎂 Cake & Wishes</a></li>
         <li><a href="#gif-section" class="nav-link" data-chapter="2">🧸 Birthday Mood</a></li>
-        <li><a href="#gallery-section" class="nav-link" data-chapter="3">📸 Yaadein</a></li>
-        <li><a href="#reasons-section" class="nav-link" data-chapter="4">✨ Khaas Baatein</a></li>
+        <li><a href="#gallery-section" class="nav-link" data-chapter="3">📸 Memories</a></li>
+        <li><a href="#reasons-section" class="nav-link" data-chapter="4">✨ Special Reasons</a></li>
         <li><a href="#letter-section" class="nav-link" data-chapter="5">💌 Special Letter</a></li>
-        <li><a href="#timeline-section" class="nav-link" data-chapter="6">📖 Dosti Ke Kisse</a></li>
+        <li><a href="#timeline-section" class="nav-link" data-chapter="6">📖 Friendship Story</a></li>
         <li><a href="#final-section" class="nav-link" data-chapter="7">🎆 Grand Finale</a></li>
       </ul>
 
@@ -185,6 +185,7 @@
               </linearGradient>
             </defs>
           </svg>
+          <div class="cute-click-tag"><span>🎁 Click karo</span></div>
         </div>
 
         <h1 class="welcome-title">Hey Birthday Girl! <span class="bow">🎀</span></h1>
@@ -193,6 +194,7 @@
         <button id="btn-open-surprise" class="btn-open-surprise pulse-button">
           <span>Apna Surprise Kholiye</span>
           <span style="font-size: 1.35rem;">💗</span>
+          <span class="cute-micro-click">Click karo ✨</span>
         </button>
 
         <div class="welcome-hint">
@@ -231,7 +233,7 @@
             "Aapko janamdin ki dher saari mubarakbaad aur badhaiyan! God kare aapka yeh saal bohot saari khushiyan, sukoon, hasi, aur success lekar aaye. Aap hamesha aise hi muskurate rahein aur jo bhi aap chahein wo sab aapko mile! 💖"
           </p>
           <button id="btn-edit-hero-wish" class="btn-edit-inline" title="Yeh message edit kijiye">
-            <span>✏️</span> Wish Message Edit Kijiye
+            <span>✏️</span> Wish Message Edit Kijiye <span class="cute-micro-click">Click karo ✨</span>
           </button>
         </div>
 
@@ -247,6 +249,7 @@
           </div>
 
           <div class="cake-container card-3d-tilt" id="interactive-cake-3d" title="Candles pe click karke bujha sakte hain ya cake rotate kijiye!">
+            <div class="cake-click-hint">🕯️ Candle pe click karo</div>
             <!-- Golden 3D Cake Topper -->
             <div class="cake-topper-3d" title="Golden Birthday Topper">
               <span class="topper-crown">👑</span>
@@ -334,10 +337,10 @@
           <!-- Cake Action Buttons -->
           <div class="cake-actions">
             <button id="btn-blow-candles" class="btn-cake-action pulse-button">
-              <span>💨</span> Wish Maangiye Aur Candles Bujhaiye
+              <span>💨</span> Wish Maangiye Aur Candles Bujhaiye <span class="cute-micro-click">Click karo ✨</span>
             </button>
             <button id="btn-sprinkle-sparkles" class="btn-cake-action secondary" title="Cake par magical sparkles chhidkiye!">
-              <span>✨</span> Magic Sparkles
+              <span>✨</span> Magic Sparkles <span class="cute-micro-click">Click karo 💕</span>
             </button>
           </div>
 
@@ -453,6 +456,7 @@
             <div class="wax-seal" id="envelope-wax-seal">
               <span>💖</span>
             </div>
+            <div class="seal-click-badge"><span>💌 Click karo</span></div>
             <h3 class="envelope-text-prompt">Tap Karke Letter Kholiye 💌</h3>
             <p class="envelope-subtext">Sirf aapke liye ek dil se likha hua secret note</p>
           </div>
@@ -525,10 +529,10 @@
 
           <div class="final-buttons-row">
             <button id="btn-launch-fireworks" class="btn-grand-celebrate pulse-button">
-              <span>🎆</span> Patakhe / Fireworks Phodiye
+              <span>🎆</span> Patakhe / Fireworks Phodiye <span class="cute-micro-click">Click karo ✨</span>
             </button>
             <button id="btn-virtual-hug" class="btn-virtual-hug">
-              <span>🤗</span> Virtual Hug Bhejiye
+              <span>🤗</span> Virtual Hug <span class="cute-micro-click">Click karo 💕</span>
             </button>
           </div>
 
@@ -542,7 +546,7 @@
             </p>
             <div class="wish-jar-input-row">
               <input type="text" id="wish-jar-input" class="wish-input" placeholder="Apni secret wish likhiye aur seal kijiye... ✨">
-              <button id="btn-save-wish" class="btn-save-wish">Wish Seal Kijiye 🌟</button>
+              <button id="btn-save-wish" class="btn-save-wish">Wish Seal Kijiye 🌟 <span class="cute-micro-click">Click karo ✨</span></button>
             </div>
           </div>
         </div>
@@ -553,22 +557,34 @@
          STORYBOOK FLOATING NAVIGATOR DOCK 🎀✨
          ========================================================================== -->
     <div id="storybook-navigator" class="storybook-navigator">
-      <button id="btn-prev-chapter" class="nav-chapter-btn prev" title="Pichla Page (Arrow Left)">
-        <span class="btn-arrow">←</span> <span class="nav-btn-text">Pichla</span>
+      <button id="btn-prev-chapter" class="nav-chapter-btn prev" title="Previous Page (Arrow Left)">
+        <span class="btn-arrow">←</span> <span class="nav-btn-text">Prev</span>
       </button>
 
       <div class="chapter-info-center">
-        <div class="chapter-badge-pill" id="chapter-badge-pill">
-          <span id="chapter-badge-icon">🎁</span>
-          <span id="chapter-badge-title">Chapter 1: The Surprise Box</span>
+        <!-- Desktop Chapter Dots Indicator -->
+        <div class="desktop-chapter-nav">
+          <div class="chapter-badge-pill" id="chapter-badge-pill">
+            <span id="chapter-badge-icon">🎁</span>
+            <span id="chapter-badge-title">Chapter 1: The Surprise Box</span>
+          </div>
+          <div class="chapter-dots-wrapper" id="chapter-dots-wrapper">
+            <!-- Dynamic 8 chapter dots -->
+          </div>
         </div>
-        <div class="chapter-dots-wrapper" id="chapter-dots-wrapper">
-          <!-- Dynamic 8 chapter dots -->
+
+        <!-- Mobile Center Music Player (Replaces dots/lines on phone: Name + Play/Pause button, no mute) -->
+        <div class="bottom-bar-music-player" id="bottom-bar-music-player" title="Music Player">
+          <div class="bottom-music-disc" id="bottom-music-disc">🎵</div>
+          <span class="bottom-music-name" id="bottom-music-name">Her 💖</span>
+          <button id="btn-bottom-music-toggle" class="btn-bottom-music-toggle" title="Play / Pause">
+            <span id="bottom-music-play-icon">▶️</span>
+          </button>
         </div>
       </div>
 
-      <button id="btn-next-chapter" class="nav-chapter-btn next" title="Agla Page (Arrow Right)">
-        <span class="nav-btn-text">Agla</span> <span class="btn-arrow">→</span>
+      <button id="btn-next-chapter" class="nav-chapter-btn next" title="Next Page (Arrow Right)">
+        <span class="nav-btn-text">Next</span> <span class="btn-arrow">→</span>
       </button>
     </div>
   </main>

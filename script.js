@@ -981,13 +981,26 @@ Always stay the same graceful & awesome soul you are. Happy Birthday! 💖✨`,
     const soundBars = document.querySelectorAll('.sound-bar');
     const musicStatus = document.getElementById('music-status');
 
-    if (disc) {
-      disc.classList.toggle('playing', isPlayingMusic);
-    }
+    // Bottom Bar Music Player Elements
+    const bottomDisc = document.getElementById('bottom-music-disc');
+    const bottomPlayBtn = document.getElementById('btn-bottom-music-toggle');
+    const bottomPlayIcon = document.getElementById('bottom-music-play-icon');
+
+    if (disc) disc.classList.toggle('playing', isPlayingMusic);
+    if (bottomDisc) bottomDisc.classList.toggle('playing', isPlayingMusic);
+
     if (playBtn) {
       playBtn.innerHTML = isPlayingMusic ? '⏸️' : '▶️';
       playBtn.title = isPlayingMusic ? 'Music Rokiye' : 'Music Bajaiye';
     }
+    if (bottomPlayBtn) {
+      bottomPlayBtn.classList.toggle('playing', isPlayingMusic);
+      bottomPlayBtn.title = isPlayingMusic ? 'Pause Song' : 'Play Song';
+    }
+    if (bottomPlayIcon) {
+      bottomPlayIcon.textContent = isPlayingMusic ? '⏸️' : '▶️';
+    }
+
     if (muteBtn) {
       muteBtn.innerHTML = isMuted ? '🔇' : '🔊';
       muteBtn.title = isMuted ? 'Awaaz Kholiye' : 'Mute Kijiye';
@@ -1188,11 +1201,11 @@ Always stay the same graceful & awesome soul you are. Happy Birthday! 💖✨`,
     { id: 'welcome-screen', title: 'The Surprise Gift Box', icon: '🎁' },
     { id: 'hero-section', title: 'The Birthday Cake & Wishes', icon: '🎂' },
     { id: 'gif-section', title: 'The Birthday Mood & Vibes', icon: '🧸' },
-    { id: 'gallery-section', title: 'Humari Pyaari Yaadein (Polaroids)', icon: '📸' },
-    { id: 'reasons-section', title: 'Khaas Baatein Jo Aapko Special Banati Hain', icon: '✨' },
-    { id: 'letter-section', title: 'Aapke Liye Ek Secret Letter', icon: '💌' },
-    { id: 'timeline-section', title: 'Dosti Ke Pyaare Chapters', icon: '📖' },
-    { id: 'final-section', title: 'Grand Finale & Fireworks Wishing Well', icon: '🎆' }
+    { id: 'gallery-section', title: 'Our Sweet Memories (Polaroids)', icon: '📸' },
+    { id: 'reasons-section', title: 'Special Reasons You Are Loved', icon: '✨' },
+    { id: 'letter-section', title: 'A Secret Letter For You', icon: '💌' },
+    { id: 'timeline-section', title: 'Our Friendship Journey', icon: '📖' },
+    { id: 'final-section', title: 'Grand Finale & Wishing Well', icon: '🎆' }
   ];
 
   let currentChapterIndex = 0;
@@ -1235,13 +1248,13 @@ Always stay the same graceful & awesome soul you are. Happy Birthday! 💖✨`,
       // Update buttons
       if (prevBtn) {
         prevBtn.disabled = currentChapterIndex === 0;
-        prevBtn.innerHTML = '<span class="btn-arrow">←</span> <span class="nav-btn-text">Pichla</span>';
+        prevBtn.innerHTML = '<span class="btn-arrow">←</span> <span class="nav-btn-text">Prev</span>';
       }
       if (nextBtn) {
         if (currentChapterIndex === CHAPTERS.length - 1) {
           nextBtn.innerHTML = '<span class="nav-btn-text">Celebrate</span> <span>🎉</span>';
         } else {
-          nextBtn.innerHTML = '<span class="nav-btn-text">Agla</span> <span class="btn-arrow">→</span>';
+          nextBtn.innerHTML = '<span class="nav-btn-text">Next</span> <span class="btn-arrow">→</span>';
         }
       }
 
@@ -1654,6 +1667,7 @@ Always stay the same graceful & awesome soul you are. Happy Birthday! 💖✨`,
         <div class="polaroid-tape ${tapeClass}"></div>
         <div class="polaroid-img-wrapper" data-photo-id="${photo.id}">
           <img src="${photo.src}" alt="${photo.caption || 'Memory'}" class="polaroid-img" loading="lazy">
+          <span class="polaroid-click-tag">Click karo 📸</span>
         </div>
         <div class="polaroid-content">
           <p class="polaroid-caption" data-photo-id="${photo.id}">${photo.caption || 'Pyaara sa moment ✨'}</p>
@@ -1957,6 +1971,7 @@ Always stay the same graceful & awesome soul you are. Happy Birthday! 💖✨`,
         </div>
         <h3 class="reason-title">${item.title}</h3>
         <p class="reason-desc">${item.desc}</p>
+        <div class="reason-click-tag"><span>✨ Click karo</span></div>
         <div class="reason-footer">
           <button class="btn-card-mini btn-edit-reason" data-id="${item.id}" title="Yeh reason edit kijiye">✏️</button>
           <button class="btn-card-mini btn-delete btn-delete-reason" data-id="${item.id}" title="Yeh reason delete kijiye">🗑️</button>
@@ -2363,14 +2378,20 @@ Always stay the same graceful & awesome soul you are. Happy Birthday! 💖✨`,
     const titleEl = document.getElementById('music-title');
 
     const customAudioData = localStorage.getItem(STORAGE_KEYS.CUSTOM_AUDIO);
-    if (customAudioData && titleEl) {
-      titleEl.innerText = 'Custom Song 🎵';
-    } else if (titleEl) {
-      titleEl.innerText = 'Her 💖';
+    const bottomTitleEl = document.getElementById('bottom-music-name');
+    if (customAudioData) {
+      if (titleEl) titleEl.innerText = 'Custom Song 🎵';
+      if (bottomTitleEl) bottomTitleEl.innerText = 'Custom Song 🎵';
+    } else {
+      if (titleEl) titleEl.innerText = 'Her 💖';
+      if (bottomTitleEl) bottomTitleEl.innerText = 'Her 💖';
     }
 
     if (playBtn) playBtn.addEventListener('click', toggleMusic);
     if (muteBtn) muteBtn.addEventListener('click', toggleMute);
+
+    const bottomPlayBtn = document.getElementById('btn-bottom-music-toggle');
+    if (bottomPlayBtn) bottomPlayBtn.addEventListener('click', toggleMusic);
 
     if (changeBtn && audioInput) {
       changeBtn.addEventListener('click', () => audioInput.click());
@@ -2386,8 +2407,9 @@ Always stay the same graceful & awesome soul you are. Happy Birthday! 💖✨`,
               customAudioElement.pause();
               customAudioElement = null;
             }
-            const titleEl = document.getElementById('music-title');
-            if (titleEl) titleEl.innerText = file.name.substring(0, 16) + '...';
+            const newTitle = file.name.substring(0, 16) + '...';
+            if (titleEl) titleEl.innerText = newTitle;
+            if (bottomTitleEl) bottomTitleEl.innerText = newTitle;
             startMusic();
             launchConfettiBurst(30);
           } catch (err) {
