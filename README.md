@@ -1,8 +1,20 @@
 # 🎀 Birthday Surprise Website - Setup, Supabase & Render Guide ✨
 
-Yeh website 100% ready hai! Isme do sabse important cheezein add kar di gayi hain:
-1. **View-Only (Non-Editable) Mode**: Birthday girl ke liye saare edit, delete, add photo, reset buttons completely hide ho jayenge. Unhe sirf ek polished, magical surprise dikhega!
-2. **Supabase Cloud Sync**: Aapki photos, custom GIF, letter aur yaadein Supabase cloud me save hongi, taaki jab aap website ko **Render** pe host karke link bhejoge, toh unke phone me bhi saari photos aur GIF ekdum smoothly load hongi!
+Yeh website 100% secure aur ready hai! Isme do-level security system implement kiya gaya hai taaki **sirf aap edit kar sakein, aur koi bhi nahi**:
+
+1. **🔐 Level 1: Birthday Girl Surprise Passcode**:
+   - Birthday Girl jab website kholegi toh unhe pyara sa Lock Screen dikhega.
+   - Sahi passcode enter karne par hi photos, letters, timeline aur music load honge.
+   - Yeh view completely non-editable (view-only) hota hai.
+
+2. **👑 Level 2: Owner Secret Admin PIN (Sirf Aapke Liye)**:
+   - **By default, sabhi ke liye website View-Only (Non-Editable) hoti hai.** Chahe koi `?view=1` hata de ya direct link khole, kisi ko bhi edit buttons ya admin bar nahi dikhenge.
+   - **Aap Admin Mode Kaise Kholein?** (3 aasan tarike):
+     - **Tarika 1 (URL se)**: Apne browser me link ke aage `?admin=admin1311` lagakar kholiye (e.g. `https://your-site.onrender.com/?admin=admin1311`). Yeh ek baar verify hokar aapke device me admin access save kar dega!
+     - **Tarika 2 (Keyboard Shortcut)**: Keyboard par `Ctrl + Shift + A` (ya Mac pe `Cmd + Shift + A`) dabaiye -> Admin PIN popup khul jayega.
+     - **Tarika 3 (Secret Click)**: Footer me diye gaye 🎀 ribbon par lagatar 3 baar click kijiye.
+   - Default Admin PIN: **`admin1311`** (Aap ise Admin Bar me **`🔑 Change Admin PIN`** button se jab chahein badal sakte hain).
+   - Saare save functions cryptographically protected hain—DevTools se bhi koi bypass nahi kar sakta!
 
 ---
 

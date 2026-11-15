@@ -52,36 +52,67 @@
   }
 
   // ==========================================
-  // 2. VIEW-ONLY (NON-EDITABLE) MODE FOR RECIPIENT
+  // 2. VIEW-ONLY VS ADMIN MODE CONTROLLER
+  // By default, EVERYONE is in View-Only mode!
+  // Only authenticated Owner/Admin can see edit controls.
   // ==========================================
   const urlParams = new URLSearchParams(window.location.search);
-  const isViewOnlyFromUrl = urlParams.get('view') === '1' || urlParams.get('mode') === 'view';
 
-  function initViewMode() {
+  async function initViewMode() {
     const adminBar = document.getElementById('admin-bar');
     const toggleBtn = document.getElementById('btn-toggle-view-mode');
     const copyShareBtn = document.getElementById('btn-copy-share-link');
+    const logoutBtn = document.getElementById('btn-admin-logout');
 
-    if (isViewOnlyFromUrl) {
-      document.body.classList.add('view-mode');
-      if (adminBar) adminBar.style.display = 'none';
-      return;
+    // 1. Check if secret ?admin=SECRET_KEY is present in URL
+    const urlAdminKey = urlParams.get('admin');
+    if (urlAdminKey) {
+      const isSuccess = await authenticateAdminWithPin(urlAdminKey);
+      if (isSuccess) {
+        // Clean URL so key is not visible in address bar
+        const cleanUrl = new URL(window.location.href);
+        cleanUrl.searchParams.delete('admin');
+        window.history.replaceState({}, '', cleanUrl.toString());
+        setTimeout(() => {
+          launchConfettiBurst(60);
+          playSparkleSound();
+          openModalNotification('👑 Welcome Admin!', 'Aapka Admin Master Access verify ho chuka hai! Ab aap photos, letters aur wishes freely edit aur save kar sakte hain.');
+        }, 500);
+      } else {
+        openModalNotification('Admin Auth Failed ❌', 'URL me enter kiya gaya Admin Master PIN galat hai!');
+      }
     }
 
+    // 2. Check if currently authenticated as admin
+    const isAdmin = await isAdminSessionValid();
+
+    if (!isAdmin) {
+      // Default: Pure View-Only for everyone
+      document.body.classList.add('view-mode');
+      if (adminBar) adminBar.style.display = 'none';
+    } else {
+      // Owner is logged in
+      document.body.classList.remove('view-mode');
+      if (adminBar) adminBar.style.display = 'flex';
+    }
+
+    // 3. Toggle View Mode for testing how Birthday Girl sees it
     if (toggleBtn) {
       toggleBtn.addEventListener('click', () => {
         document.body.classList.toggle('view-mode');
         const isNowView = document.body.classList.contains('view-mode');
-        toggleBtn.innerHTML = isNowView ? '<span>✏️</span> Wapas Edit Mode Me Jaiye' : '<span>👁️</span> Birthday Girl View Check Kijiye';
+        toggleBtn.innerHTML = isNowView ? '<span>✏️</span> Wapas Edit Controls Dikhao' : '<span>👁️</span> View Mode Check Kijiye';
       });
     }
 
+    // 4. Shareable Link (Forces clean view mode link)
     if (copyShareBtn) {
       copyShareBtn.addEventListener('click', async () => {
         const shareUrl = new URL(window.location.href);
+        shareUrl.searchParams.delete('admin');
         shareUrl.searchParams.set('view', '1');
         const cfg = await getPasscodeConfig();
-        const passcodeInfo = cfg.enabled ? `\n\n🔐 Secret Passcode: ${cfg.passcode}\n(Birthday Girl ko link ke saath yeh passcode bhi bhej dijiyega taaki wo surprise unlock kar sakein! 🎀)` : '';
+        const passcodeInfo = cfg.enabled ? `\n\n🔐 Note: Website secret passcode se locked hai.\n(Birthday Girl ko link ke saath aapka set kiya hua secret passcode bhi bhej dijiyega taaki wo surprise unlock kar sakein! 🎀)` : '';
         navigator.clipboard.writeText(shareUrl.toString()).then(() => {
           launchConfettiBurst(50);
           playSparkleSound();
@@ -92,6 +123,19 @@
         });
       });
     }
+
+    // 5. Logout Admin Button
+    if (logoutBtn) {
+      logoutBtn.addEventListener('click', () => {
+        localStorage.removeItem('jm_bday_admin_session');
+        document.body.classList.add('view-mode');
+        openModalNotification('Admin Logged Out 🚪', 'Aap Admin mode se bahar aa chuke hain. Website ab safe View-Only mode me hai.');
+        setTimeout(() => window.location.reload(), 1200);
+      });
+    }
+
+    // 6. Setup Admin Security UI (Secret Trigger, Admin Login Modal, Change PIN Modal)
+    setupAdminSecurityUI();
   }
 
   const DEFAULT_LETTER = {
@@ -229,6 +273,7 @@ Always stay the same graceful & awesome soul you are. Happy Birthday! 💖✨`,
 }
 
   async function savePhoto(photo) {
+    if (!(await verifyAdminAuthOrReject('Photo save'))) return;
     await savePhotoToDBLocal(photo);
     if (supabase) {
       try {
@@ -262,6 +307,7 @@ Always stay the same graceful & awesome soul you are. Happy Birthday! 💖✨`,
   }
 
   async function deletePhoto(id) {
+    if (!(await verifyAdminAuthOrReject('Photo delete'))) return;
     await deletePhotoFromDBLocal(id);
     if (supabase) {
       try {
@@ -269,6 +315,242 @@ Always stay the same graceful & awesome soul you are. Happy Birthday! 💖✨`,
       } catch (err) {
         console.warn('Could not delete photo from Supabase:', err);
       }
+    }
+  }
+
+  // ==========================================
+  // CRYPTOGRAPHIC VAULT SECURITY (SHA-256 + SALT)
+  // ==========================================
+  function generateSecureSalt() {
+    const array = new Uint8Array(16);
+    crypto.getRandomValues(array);
+    return Array.from(array).map(b => b.toString(16).padStart(2, '0')).join('');
+  }
+
+  async function hashString(str) {
+    const enc = new TextEncoder();
+    const data = enc.encode(str);
+    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+    return Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
+  }
+
+  async function computePasscodeHash(passcode, salt) {
+    return await hashString(passcode.toString().trim().toLowerCase() + ':' + salt);
+  }
+
+  async function getSessionToken(hash) {
+    return await hashString(hash + ':jm_vault_session_key_v1');
+  }
+
+  async function isSessionAuthenticated(cfg) {
+    if (!cfg || !cfg.enabled) return true;
+    const storedToken = sessionStorage.getItem('jm_bday_vault_session');
+    if (!storedToken) return false;
+    const expectedToken = await getSessionToken(cfg.hash);
+    return storedToken === expectedToken;
+  }
+
+  // ==========================================
+  // ADMIN MASTER ACCESS SYSTEM (Only Owner Can Edit)
+  // Default Admin PIN: admin1311 (Salted SHA-256 Hash)
+  // ==========================================
+  const DEFAULT_ADMIN_CONFIG = {
+    salt: 'admin_salt_v1',
+    hash: 'd5119492af74211b9f6bf1e573199bbbf93bfb875b73a4667266fd4b0c1d45c5' // hash of 'admin1311'
+  };
+
+  async function getAdminConfig() {
+    let cfg = null;
+    if (supabase) {
+      try {
+        const { data } = await supabase
+          .from('birthday_settings')
+          .select('value')
+          .eq('key', 'admin_pin_config')
+          .maybeSingle();
+        if (data && data.value) cfg = data.value;
+      } catch (e) {}
+    }
+    if (!cfg) {
+      const stored = localStorage.getItem('jm_bday_admin_pin_config');
+      cfg = stored ? JSON.parse(stored) : { ...DEFAULT_ADMIN_CONFIG };
+    }
+    if (!cfg || !cfg.hash) cfg = { ...DEFAULT_ADMIN_CONFIG };
+    return cfg;
+  }
+
+  async function saveAdminConfig(cfg) {
+    localStorage.setItem('jm_bday_admin_pin_config', JSON.stringify(cfg));
+    if (supabase) {
+      try {
+        await supabase.from('birthday_settings').upsert({ key: 'admin_pin_config', value: cfg });
+      } catch (e) {}
+    }
+  }
+
+  async function isAdminSessionValid() {
+    const adminCfg = await getAdminConfig();
+    const token = localStorage.getItem('jm_bday_admin_session');
+    if (!token) return false;
+    const expected = await hashString(adminCfg.hash + ':admin_master_auth_v1');
+    return token === expected;
+  }
+
+  async function authenticateAdminWithPin(enteredPin) {
+    if (!enteredPin) return false;
+    const adminCfg = await getAdminConfig();
+    const enteredHash = await computePasscodeHash(enteredPin.trim(), adminCfg.salt);
+    if (enteredHash === adminCfg.hash) {
+      const token = await hashString(adminCfg.hash + ':admin_master_auth_v1');
+      localStorage.setItem('jm_bday_admin_session', token);
+      return true;
+    }
+    return false;
+  }
+
+  async function verifyAdminAuthOrReject(actionName = 'Yeh action perform') {
+    const isAuth = await isAdminSessionValid();
+    if (!isAuth) {
+      openModalNotification('Access Denied 🔒', `${actionName} karne ke liye Admin permissions chahiye! Sirf website owner hi edit kar sakta hai.`);
+      return false;
+    }
+    return true;
+  }
+
+  function setupAdminSecurityUI() {
+    const modalAdminLogin = document.getElementById('modal-admin-login');
+    const btnCloseLoginModal = document.getElementById('btn-close-admin-login-modal');
+    const formAdminLogin = document.getElementById('form-admin-login');
+    const inputAdminMasterKey = document.getElementById('input-admin-master-key');
+    const adminLoginError = document.getElementById('admin-login-error');
+    const secretTrigger = document.getElementById('secret-admin-trigger');
+    const navBrand = document.querySelector('.nav-brand');
+
+    const modalChangePin = document.getElementById('modal-change-admin-pin');
+    const btnCloseChangePin = document.getElementById('btn-close-change-admin-pin-modal');
+    const btnOpenChangePin = document.getElementById('btn-change-admin-pin');
+    const inputNewPin = document.getElementById('input-new-admin-pin');
+    const btnSaveNewPin = document.getElementById('btn-save-new-admin-pin');
+
+    function openAdminLogin() {
+      if (modalAdminLogin) {
+        if (inputAdminMasterKey) inputAdminMasterKey.value = '';
+        if (adminLoginError) adminLoginError.style.display = 'none';
+        modalAdminLogin.classList.add('active');
+        setTimeout(() => { if (inputAdminMasterKey) inputAdminMasterKey.focus(); }, 150);
+      }
+    }
+
+    function closeAdminLogin() {
+      if (modalAdminLogin) modalAdminLogin.classList.remove('active');
+    }
+
+    if (btnCloseLoginModal) btnCloseLoginModal.addEventListener('click', closeAdminLogin);
+    if (modalAdminLogin) {
+      modalAdminLogin.addEventListener('click', (e) => {
+        if (e.target === modalAdminLogin) closeAdminLogin();
+      });
+    }
+
+    // Secret Triple-Click Triggers on footer ribbon or logo
+    let clickCount = 0;
+    let clickTimer = null;
+    function handleSecretClick() {
+      clickCount++;
+      if (clickTimer) clearTimeout(clickTimer);
+      clickTimer = setTimeout(() => { clickCount = 0; }, 1200);
+      if (clickCount >= 3) {
+        clickCount = 0;
+        openAdminLogin();
+      }
+    }
+
+    if (secretTrigger) secretTrigger.addEventListener('click', handleSecretClick);
+    if (navBrand) {
+      navBrand.addEventListener('click', (e) => {
+        if (e.ctrlKey || e.metaKey) {
+          e.preventDefault();
+          openAdminLogin();
+        } else {
+          handleSecretClick();
+        }
+      });
+    }
+
+    // Keyboard shortcut: Ctrl + Shift + A or Cmd + Shift + A
+    window.addEventListener('keydown', (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === 'A' || e.key === 'a')) {
+        e.preventDefault();
+        openAdminLogin();
+      }
+    });
+
+    // Handle Admin Login Submit
+    if (formAdminLogin) {
+      formAdminLogin.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        if (!inputAdminMasterKey) return;
+        const entered = inputAdminMasterKey.value.trim();
+        const success = await authenticateAdminWithPin(entered);
+        if (success) {
+          if (adminLoginError) adminLoginError.style.display = 'none';
+          closeAdminLogin();
+          document.body.classList.remove('view-mode');
+          const adminBar = document.getElementById('admin-bar');
+          if (adminBar) adminBar.style.display = 'flex';
+          launchConfettiBurst(60);
+          playSparkleSound();
+          openModalNotification('👑 Welcome Admin!', 'Aap Admin authenticate ho chuke hain! Ab aap sabhi photos, letter, aur wishes ko freely edit aur save kar sakte hain.');
+        } else {
+          if (adminLoginError) adminLoginError.style.display = 'block';
+          inputAdminMasterKey.classList.add('input-error');
+          inputAdminMasterKey.select();
+        }
+      });
+    }
+
+    // Change Admin PIN logic
+    if (btnOpenChangePin && modalChangePin) {
+      btnOpenChangePin.addEventListener('click', () => {
+        if (inputNewPin) inputNewPin.value = '';
+        modalChangePin.classList.add('active');
+        setTimeout(() => { if (inputNewPin) inputNewPin.focus(); }, 150);
+      });
+    }
+
+    function closeChangePinModal() {
+      if (modalChangePin) modalChangePin.classList.remove('active');
+    }
+
+    if (btnCloseChangePin) btnCloseChangePin.addEventListener('click', closeChangePinModal);
+    if (modalChangePin) {
+      modalChangePin.addEventListener('click', (e) => {
+        if (e.target === modalChangePin) closeChangePinModal();
+      });
+    }
+
+    if (btnSaveNewPin) {
+      btnSaveNewPin.addEventListener('click', async () => {
+        if (!inputNewPin) return;
+        const newPin = inputNewPin.value.trim();
+        if (!newPin || newPin.length < 4) {
+          alert('Kripya kam se kam 4 characters ka strong Admin PIN daliye!');
+          return;
+        }
+
+        const newSalt = generateSecureSalt();
+        const newHash = await computePasscodeHash(newPin, newSalt);
+        const newCfg = { salt: newSalt, hash: newHash };
+        await saveAdminConfig(newCfg);
+
+        // Update current session with new token
+        const newToken = await hashString(newHash + ':admin_master_auth_v1');
+        localStorage.setItem('jm_bday_admin_session', newToken);
+
+        closeChangePinModal();
+        launchConfettiBurst(50);
+        openModalNotification('Admin PIN Updated! 🔑✨', 'Aapka naya Admin Master PIN successfully update aur encrypt ho chuka hai! Ab se sirf iss naye PIN se hi Admin controls unlock honge.');
+      });
     }
   }
 
@@ -289,14 +571,16 @@ Always stay the same graceful & awesome soul you are. Happy Birthday! 💖✨`,
     INITIALIZED_RESPECT_V4: 'jm_bday_init_respect_v4'
   };
 
-
+  // Secure default configuration (Salted SHA-256 hash for default code '1311', never exposed in plaintext)
   const DEFAULT_PASSCODE_CONFIG = {
     enabled: true,
-    passcode: '1311',
+    salt: 'bday_salt_v1',
+    hash: 'a4324c2548cac57448b0efccd5084c2b16a0ccfef86242917d47a753ed24f821',
     hint: 'Hint: ni duga ehehehehe🎀'
   };
 
   async function getPasscodeConfig() {
+    let cfg = null;
     if (supabase) {
       try {
         const { data } = await supabase
@@ -304,18 +588,43 @@ Always stay the same graceful & awesome soul you are. Happy Birthday! 💖✨`,
           .select('value')
           .eq('key', 'passcode_lock')
           .maybeSingle();
-        if (data && data.value) return data.value;
+        if (data && data.value) cfg = data.value;
       } catch (e) {}
     }
-    const stored = localStorage.getItem(STORAGE_KEYS.PASSCODE_LOCK);
-    return stored ? JSON.parse(stored) : DEFAULT_PASSCODE_CONFIG;
+    if (!cfg) {
+      const stored = localStorage.getItem(STORAGE_KEYS.PASSCODE_LOCK);
+      cfg = stored ? JSON.parse(stored) : { ...DEFAULT_PASSCODE_CONFIG };
+    }
+
+    // Auto-migration for legacy plaintext passcode
+    if (cfg && cfg.passcode && !cfg.hash) {
+      const salt = generateSecureSalt();
+      cfg.salt = salt;
+      cfg.hash = await computePasscodeHash(cfg.passcode, salt);
+      delete cfg.passcode;
+      await savePasscodeConfig(cfg);
+    }
+
+    // Fallback if hash missing
+    if (!cfg || !cfg.hash) {
+      cfg = { ...DEFAULT_PASSCODE_CONFIG };
+    }
+
+    return cfg;
   }
 
   async function savePasscodeConfig(cfg) {
-    localStorage.setItem(STORAGE_KEYS.PASSCODE_LOCK, JSON.stringify(cfg));
+    if (!(await verifyAdminAuthOrReject('Passcode settings badalna'))) return;
+    const safeCfg = {
+      enabled: cfg.enabled !== false,
+      salt: cfg.salt || generateSecureSalt(),
+      hash: cfg.hash,
+      hint: cfg.hint || ''
+    };
+    localStorage.setItem(STORAGE_KEYS.PASSCODE_LOCK, JSON.stringify(safeCfg));
     if (supabase) {
       try {
-        await supabase.from('birthday_settings').upsert({ key: 'passcode_lock', value: cfg });
+        await supabase.from('birthday_settings').upsert({ key: 'passcode_lock', value: safeCfg });
       } catch (e) {}
     }
   }
@@ -331,6 +640,7 @@ Always stay the same graceful & awesome soul you are. Happy Birthday! 💖✨`,
     return stored ? JSON.parse(stored) : DEFAULT_LETTER;
   }
   async function saveLetterData(data) {
+    if (!(await verifyAdminAuthOrReject('Letter save'))) return;
     localStorage.setItem(STORAGE_KEYS.LETTER, JSON.stringify(data));
     if (supabase) {
       try {
@@ -359,6 +669,7 @@ Always stay the same graceful & awesome soul you are. Happy Birthday! 💖✨`,
     return data?.value || [];
 }
   async function saveReasonsData(data) {
+    if (!(await verifyAdminAuthOrReject('Reasons save'))) return;
     localStorage.setItem(STORAGE_KEYS.REASONS, JSON.stringify(data));
     if (supabase) {
       try {
@@ -378,6 +689,7 @@ Always stay the same graceful & awesome soul you are. Happy Birthday! 💖✨`,
     return stored ? JSON.parse(stored) : DEFAULT_TIMELINE;
   }
   async function saveTimelineData(data) {
+    if (!(await verifyAdminAuthOrReject('Timeline save'))) return;
     localStorage.setItem(STORAGE_KEYS.TIMELINE, JSON.stringify(data));
     if (supabase) {
       try {
@@ -422,6 +734,7 @@ Always stay the same graceful & awesome soul you are. Happy Birthday! 💖✨`,
   }
 
   async function saveGifData(newSrc, newCaption) {
+    if (!(await verifyAdminAuthOrReject('GIF save'))) return;
     // Current data prapt kijiye taaki jo cheez change nahi hui wo gayab na ho
     const current = await getGifData();
 
@@ -929,8 +1242,10 @@ Always stay the same graceful & awesome soul you are. Happy Birthday! 💖✨`,
     }
 
     if (editHeroWishBtn && heroWishEl) {
-      editHeroWishBtn.addEventListener('click', () => {
+      editHeroWishBtn.addEventListener('click', async () => {
+        if (!(await verifyAdminAuthOrReject('Wish message edit'))) return;
         openEditSimpleModal('Birthday Wish Message Badliye', heroWishEl.innerText, async (newText) => {
+          if (!(await verifyAdminAuthOrReject('Wish message save'))) return;
           heroWishEl.innerText = newText;
           localStorage.setItem(STORAGE_KEYS.HERO_WISH, newText);
           if (supabase) {
@@ -1945,6 +2260,7 @@ Always stay the same graceful & awesome soul you are. Happy Birthday! 💖✨`,
     const resetBtn = document.getElementById('btn-reset-website');
     if (resetBtn) {
       resetBtn.addEventListener('click', async () => {
+        if (!(await verifyAdminAuthOrReject('Website reset'))) return;
         if (confirm('Kya sach me website ko default respectful bestie template pe reset karna hai? Isse saari original photos aur text restore ho jayenge. 🌸')) {
           localStorage.clear();
           await saveLetterData(DEFAULT_LETTER);
@@ -1971,6 +2287,35 @@ Always stay the same graceful & awesome soul you are. Happy Birthday! 💖✨`,
     }
   }
 
+
+  // ==========================================
+  // GATED WEBSITE INITIALIZATION
+  // Only runs after secret passcode is validated
+  // ==========================================
+  let isAppInitialized = false;
+  async function unlockAndInitializeWebsite() {
+    if (isAppInitialized) return;
+    isAppInitialized = true;
+
+    // Remove CSS vault lock
+    document.body.classList.remove('vault-locked');
+
+    await initSeedsIfNeeded();
+    setupWelcomeScreen();
+    setupBirthdayCake();
+    await setupGifSection();
+    await renderGallery();
+    setupGalleryModal();
+    await renderReasons();
+    setupReasonsEditor();
+    await setupLetterSection();
+    await renderTimeline();
+    setupTimelineActions();
+    setupFinalSection();
+    setupMusicPlayer();
+    setupResetButton();
+    setupMobileNav();
+  }
 
   // ==========================================
   // PASSCODE LOCK & SURPRISE VAULT SYSTEM
@@ -2004,7 +2349,7 @@ Always stay the same graceful & awesome soul you are. Happy Birthday! 💖✨`,
     function updateAdminUI(cfg) {
       if (adminPill) {
         if (cfg.enabled) {
-          adminPill.textContent = cfg.passcode || '1311';
+          adminPill.textContent = 'Active 🔒';
           adminPill.style.color = 'var(--color-pink-deep)';
         } else {
           adminPill.textContent = 'Off';
@@ -2015,12 +2360,51 @@ Always stay the same graceful & awesome soul you are. Happy Birthday! 💖✨`,
 
     updateAdminUI(currentConfig);
 
-    // Check if session is already unlocked
-    const isSessionUnlocked = sessionStorage.getItem('jm_bday_unlocked') === 'true';
+    // Rate Limiting / Brute-force protection
+    let failedAttempts = 0;
+    let lockoutUntil = 0;
+    let lockoutTimer = null;
+
+    function isLockedOut() {
+      const now = Date.now();
+      if (lockoutUntil > now) {
+        const remaining = Math.ceil((lockoutUntil - now) / 1000);
+        if (errorMsg) {
+          errorMsg.style.display = 'block';
+          errorMsg.innerHTML = `<span>⏳ Bohot saare galat attempts! Kripya <strong>${remaining}s</strong> intezaar kijiye 🙈</span>`;
+        }
+        if (passcodeInput) passcodeInput.disabled = true;
+        if (unlockBtn) unlockBtn.disabled = true;
+        return true;
+      }
+      if (passcodeInput) passcodeInput.disabled = false;
+      if (unlockBtn) unlockBtn.disabled = false;
+      return false;
+    }
+
+    function triggerLockout() {
+      lockoutUntil = Date.now() + 30000; // 30 second cooldown
+      failedAttempts = 0;
+      isLockedOut();
+      if (lockoutTimer) clearInterval(lockoutTimer);
+      lockoutTimer = setInterval(() => {
+        if (!isLockedOut()) {
+          clearInterval(lockoutTimer);
+          lockoutTimer = null;
+          if (errorMsg) errorMsg.style.display = 'none';
+          if (passcodeInput) passcodeInput.focus();
+        }
+      }, 1000);
+    }
+
+    // Check if session is already cryptographically authenticated
+    const isSessionUnlocked = await isSessionAuthenticated(currentConfig);
 
     if (!currentConfig.enabled || isSessionUnlocked) {
       if (lockScreen) lockScreen.style.display = 'none';
+      await unlockAndInitializeWebsite();
     } else {
+      document.body.classList.add('vault-locked');
       if (lockScreen) {
         lockScreen.style.display = 'flex';
         if (currentConfig.hint && currentConfig.hint.trim()) {
@@ -2050,43 +2434,36 @@ Always stay the same graceful & awesome soul you are. Happy Birthday! 💖✨`,
     // Handle Unlock
     async function attemptUnlock() {
       if (!passcodeInput) return;
+      if (isLockedOut()) return;
+
       const entered = passcodeInput.value.trim();
       currentConfig = await getPasscodeConfig();
-      const expected = (currentConfig.passcode || '1311').toString().trim();
 
-      if (!currentConfig.enabled || entered.toLowerCase() === expected.toLowerCase()) {
-        // SUCCESS UNLOCK!
-        if (errorMsg) errorMsg.style.display = 'none';
-        passcodeInput.classList.remove('input-error');
-        if (lockEmoji) lockEmoji.textContent = '🔓';
-        if (lockCircle) lockCircle.classList.add('unlocked-glow');
-        if (unlockBtn) {
-          unlockBtn.innerHTML = '<span>Unlocked! Khul Gaya 💖</span>';
-          unlockBtn.style.background = '#10B981';
+      if (!currentConfig.enabled) {
+        grantUnlock();
+        return;
+      }
+
+      if (!entered) {
+        if (errorMsg) {
+          errorMsg.style.display = 'block';
+          errorMsg.innerHTML = '<span>Kripya secret passcode enter kijiye! ✨</span>';
         }
+        passcodeInput.classList.add('input-error');
+        return;
+      }
 
-        launchConfettiBurst(80, window.innerWidth / 2, window.innerHeight / 2);
-        playSparkleSound();
-        sessionStorage.setItem('jm_bday_unlocked', 'true');
+      const enteredHash = await computePasscodeHash(entered, currentConfig.salt);
 
-        setTimeout(() => {
-          if (lockScreen) {
-            lockScreen.classList.add('fade-out');
-            setTimeout(() => {
-              lockScreen.style.display = 'none';
-              lockScreen.classList.remove('fade-out');
-              if (unlockBtn) {
-                unlockBtn.innerHTML = '<span>Surprise Unlock Kijiye</span> <span class="unlock-btn-icon">💖</span>';
-                unlockBtn.style.background = '';
-              }
-              if (lockEmoji) lockEmoji.textContent = '🔒';
-              if (lockCircle) lockCircle.classList.remove('unlocked-glow');
-            }, 600);
-          }
-        }, 450);
+      if (enteredHash === currentConfig.hash) {
+        grantUnlock();
       } else {
-        // ERROR WRONG PASSCODE
-        if (errorMsg) errorMsg.style.display = 'block';
+        // WRONG PASSCODE
+        failedAttempts++;
+        if (errorMsg) {
+          errorMsg.style.display = 'block';
+          errorMsg.innerHTML = '<span>❌ Galat passcode hai! Ek baar aur sochiye 🙈</span>';
+        }
         passcodeInput.classList.add('input-error');
         if (passcodeCard) {
           passcodeCard.classList.remove('shake-card');
@@ -2094,7 +2471,48 @@ Always stay the same graceful & awesome soul you are. Happy Birthday! 💖✨`,
           passcodeCard.classList.add('shake-card');
         }
         passcodeInput.select();
+
+        if (failedAttempts >= 5) {
+          triggerLockout();
+        }
       }
+    }
+
+    async function grantUnlock() {
+      if (errorMsg) errorMsg.style.display = 'none';
+      if (passcodeInput) passcodeInput.classList.remove('input-error');
+      if (lockEmoji) lockEmoji.textContent = '🔓';
+      if (lockCircle) lockCircle.classList.add('unlocked-glow');
+      if (unlockBtn) {
+        unlockBtn.innerHTML = '<span>Unlocked! Khul Gaya 💖</span>';
+        unlockBtn.style.background = '#10B981';
+      }
+
+      launchConfettiBurst(80, window.innerWidth / 2, window.innerHeight / 2);
+      playSparkleSound();
+
+      // Store cryptographically signed session token
+      const sessionToken = await getSessionToken(currentConfig.hash);
+      sessionStorage.setItem('jm_bday_vault_session', sessionToken);
+
+      setTimeout(() => {
+        if (lockScreen) {
+          lockScreen.classList.add('fade-out');
+          setTimeout(async () => {
+            lockScreen.style.display = 'none';
+            lockScreen.classList.remove('fade-out');
+            if (unlockBtn) {
+              unlockBtn.innerHTML = '<span>Surprise Unlock Kijiye</span> <span class="unlock-btn-icon">💖</span>';
+              unlockBtn.style.background = '';
+            }
+            if (lockEmoji) lockEmoji.textContent = '🔒';
+            if (lockCircle) lockCircle.classList.remove('unlocked-glow');
+            await unlockAndInitializeWebsite();
+          }, 600);
+        } else {
+          unlockAndInitializeWebsite();
+        }
+      }, 450);
     }
 
     if (unlockForm) {
@@ -2115,7 +2533,10 @@ Always stay the same graceful & awesome soul you are. Happy Birthday! 💖✨`,
       btnSetupPasscode.addEventListener('click', async () => {
         currentConfig = await getPasscodeConfig();
         if (toggleEnabled) toggleEnabled.checked = currentConfig.enabled !== false;
-        if (adminPassInput) adminPassInput.value = currentConfig.passcode || '1311';
+        if (adminPassInput) {
+          adminPassInput.value = '';
+          adminPassInput.placeholder = 'Naya passcode likhiye (ya purana rehne dijiye)';
+        }
         if (adminHintInput) adminHintInput.value = currentConfig.hint || '';
         modalSetup.classList.add('active');
       });
@@ -2134,25 +2555,48 @@ Always stay the same graceful & awesome soul you are. Happy Birthday! 💖✨`,
 
     if (btnSavePass) {
       btnSavePass.addEventListener('click', async () => {
-        const newCfg = {
-          enabled: toggleEnabled ? toggleEnabled.checked : true,
-          passcode: (adminPassInput && adminPassInput.value.trim()) ? adminPassInput.value.trim() : '1311',
-          hint: adminHintInput ? adminHintInput.value.trim() : ''
-        };
+        const rawInput = adminPassInput ? adminPassInput.value.trim() : '';
+        const isEnabled = toggleEnabled ? toggleEnabled.checked : true;
+        const hintText = adminHintInput ? adminHintInput.value.trim() : '';
+
+        let newCfg;
+        if (rawInput) {
+          const salt = generateSecureSalt();
+          const hash = await computePasscodeHash(rawInput, salt);
+          newCfg = {
+            enabled: isEnabled,
+            salt: salt,
+            hash: hash,
+            hint: hintText
+          };
+        } else {
+          newCfg = {
+            ...currentConfig,
+            enabled: isEnabled,
+            hint: hintText
+          };
+        }
+
         await savePasscodeConfig(newCfg);
         currentConfig = newCfg;
         updateAdminUI(newCfg);
+
+        // Update admin session so admin stays authenticated
+        const sessionToken = await getSessionToken(newCfg.hash);
+        sessionStorage.setItem('jm_bday_vault_session', sessionToken);
+
         closePasscodeModal();
         launchConfettiBurst(40);
         openModalNotification('Passcode Settings Saved! 🔐💖',
-          `Aapka Passcode Lock successfully update ho gaya hai!\n\nStatus: ${newCfg.enabled ? 'ACTIVE ✅' : 'OFF'}\nSecret Passcode: ${newCfg.passcode}\nHint: ${newCfg.hint || 'None'}\n\nBirthday Girl jab website kholegi toh unhe yeh secret passcode enter karna hoga!`);
+          `Aapka Passcode Lock successfully update ho gaya hai!\n\nStatus: ${newCfg.enabled ? 'ACTIVE ✅' : 'OFF'}\nHint: ${newCfg.hint || 'None'}\n\nSecret Passcode securely SHA-256 + Salt ke sath encrypt ho chuka hai aur database me safely sync ho chuka hai!`);
       });
     }
 
     if (btnTestLock) {
       btnTestLock.addEventListener('click', async () => {
         closePasscodeModal();
-        sessionStorage.removeItem('jm_bday_unlocked');
+        sessionStorage.removeItem('jm_bday_vault_session');
+        document.body.classList.add('vault-locked');
         currentConfig = await getPasscodeConfig();
         if (passcodeInput) {
           passcodeInput.value = '';
@@ -2180,28 +2624,13 @@ Always stay the same graceful & awesome soul you are. Happy Birthday! 💖✨`,
     }
   }
 
-    // ==========================================
+  // ==========================================
   // 20. INIT ON DOM CONTENT LOADED
   // ==========================================
   window.addEventListener('DOMContentLoaded', async () => {
     initViewMode();
-    await setupPasscodeLockSystem();
     updateSupabaseStatusUI();
-    await initSeedsIfNeeded();
-    setupWelcomeScreen();
-    setupBirthdayCake();
-    await setupGifSection();
-    await renderGallery();
-    setupGalleryModal();
-    await renderReasons();
-    setupReasonsEditor();
-    await setupLetterSection();
-    await renderTimeline();
-    setupTimelineActions();
-    setupFinalSection();
-    setupMusicPlayer();
-    setupResetButton();
-    setupMobileNav();
+    await setupPasscodeLockSystem();
   });
 
 })();

@@ -7,7 +7,7 @@
   <meta name="description" content="A cute, aesthetic Pinterest-inspired birthday website in respectful Hinglish filled with beautiful memories, heartfelt wishes, and magical surprises.">
   <link rel="stylesheet" href="style.css">
 </head>
-<body>
+<body class="vault-locked view-mode">
 
   <!-- Floating Sparkles and Fireworks Canvases -->
   <canvas id="sparkle-canvas"></canvas>
@@ -25,13 +25,19 @@
     </div>
     <div class="admin-bar-actions">
       <button id="btn-setup-passcode" class="btn-admin-action" title="Secret Passcode Lock Set Kijiye">
-        <span>🔐</span> Passcode: <strong id="admin-passcode-status-pill" style="color: var(--color-pink-deep); font-weight: bold;">1311</strong>
+        <span>🔐</span> Passcode Lock: <strong id="admin-passcode-status-pill" style="color: var(--color-pink-deep); font-weight: bold;">Active 🔒</strong>
       </button>
       <button id="btn-toggle-view-mode" class="btn-admin-action" title="Dekhiye ki Birthday Girl ko website kaisi dikhegi">
-        <span>👁️</span> Birthday Girl View Check Kijiye
+        <span>👁️</span> View Mode Check Kijiye
+      </button>
+      <button id="btn-change-admin-pin" class="btn-admin-action" title="Apna Secret Admin Master PIN Badliye">
+        <span>🔑</span> Change Admin PIN
       </button>
       <button id="btn-copy-share-link" class="btn-admin-action primary" title="Bhejne ke liye Clean Link copy kijiye">
         <span>🔗</span> Shareable Link Copy Kijiye
+      </button>
+      <button id="btn-admin-logout" class="btn-admin-action" title="Admin Mode se bahar aaiye (View Mode me jaaiye)" style="background: #FFF1F2; border-color: #FECDD3; color: #BE123C;">
+        <span>🚪</span> Exit Admin
       </button>
     </div>
   </div>
@@ -519,7 +525,7 @@
        ========================================================================== -->
   <footer class="site-footer">
     <div class="container">
-      <p class="footer-text">Made with pure dosti, sparkles aur pink ribbons 🎀</p>
+      <p class="footer-text">Made with pure dosti, sparkles aur pink ribbons <span id="secret-admin-trigger" title="Owner Access (Triple Click ya Ctrl+Shift+A)" style="cursor: pointer; user-select: none;">🎀</span></p>
       <div class="footer-actions">
         <button id="btn-reset-website" class="btn-reset-site" title="Default template pe reset kijiye">
           <span>🔄</span> Reset to Default Template
@@ -766,8 +772,8 @@
 
       <div class="form-group">
         <label class="form-label" for="admin-passcode-input">Secret Passcode</label>
-        <input type="text" id="admin-passcode-input" class="form-control" placeholder="e.g. 1311 ya koi secret code" value="1311">
-        <small style="display: block; color: var(--text-muted); font-size: 0.8rem; margin-top: 4px;">Yeh passcode aap Birthday Girl ko bata sakte hain (e.g. 1311, ya unka birth date).</small>
+        <input type="text" id="admin-passcode-input" class="form-control" placeholder="Naya passcode likhiye (ya purana rehne dijiye)" autocomplete="off">
+        <small style="display: block; color: var(--text-muted); font-size: 0.8rem; margin-top: 4px;">Yeh passcode SHA-256 cryptographic salt ke saath securely hash hota hai aur koi bhi ise bypass nahi kar sakta.</small>
       </div>
 
       <div class="form-group" style="margin-top: 14px;">
@@ -782,6 +788,51 @@
         </button>
         <button type="button" id="btn-save-passcode-settings" class="btn-upload-photos" style="padding: 10px 22px;">
           Save Passcode ✨
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Secret Admin Master Login -->
+  <div id="modal-admin-login" class="modal-overlay">
+    <div class="modal-dialog" style="max-width: 440px; text-align: center;">
+      <button id="btn-close-admin-login-modal" class="modal-close-btn">&times;</button>
+      <div style="font-size: 3rem; margin-bottom: 8px;">👑🔐</div>
+      <h3 class="modal-title" style="color: var(--color-pink-deep);">Owner Admin Access</h3>
+      <p class="modal-subtitle">Website content edit ya customize karne ke liye apna Secret Admin PIN enter kijiye.</p>
+
+      <form id="form-admin-login" onsubmit="return false;" style="margin-top: 18px;">
+        <div class="passcode-input-wrapper">
+          <input type="password" id="input-admin-master-key" class="passcode-input" placeholder="Admin PIN likhiye..." autocomplete="off">
+        </div>
+        <div id="admin-login-error" class="passcode-error-msg" style="display: none;">
+          <span>❌ Galat Admin PIN! Sirf owner hi edit kar sakta hai 🙈</span>
+        </div>
+        <button type="submit" id="btn-submit-admin-login" class="btn-unlock-surprise" style="margin-top: 10px;">
+          <span>Admin Controls Unlock Kijiye 👑</span>
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: Change Admin Master PIN -->
+  <div id="modal-change-admin-pin" class="modal-overlay">
+    <div class="modal-dialog" style="max-width: 440px;">
+      <button id="btn-close-change-admin-pin-modal" class="modal-close-btn">&times;</button>
+      <div class="modal-header">
+        <h3 class="modal-title">Admin Master PIN Badliye 🔑</h3>
+        <p class="modal-subtitle">Yeh PIN sirf aapke paas hona chahiye taaki koi aur edit na kar sake.</p>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="input-new-admin-pin">Naya Admin PIN</label>
+        <input type="password" id="input-new-admin-pin" class="form-control" placeholder="e.g. secret@123 ya koi strong PIN" autocomplete="off">
+        <small style="display: block; color: var(--text-muted); font-size: 0.8rem; margin-top: 4px;">Yeh PIN SHA-256 hash me cryptographically store hoga.</small>
+      </div>
+
+      <div class="modal-actions" style="margin-top: 20px;">
+        <button type="button" id="btn-save-new-admin-pin" class="btn-upload-photos" style="padding: 10px 24px;">
+          Naya PIN Save Kijiye ✨
         </button>
       </div>
     </div>

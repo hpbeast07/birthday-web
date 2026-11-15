@@ -952,6 +952,7 @@ section {
 /* ==========================================================================
    VIEW-ONLY / PRESENTATION MODE (READ-ONLY FOR BIRTHDAY GIRL)
    ========================================================================== */
+body.view-mode .admin-bar,
 body.view-mode .btn-edit-inline,
 body.view-mode .btn-upload-photos,
 body.view-mode .btn-change-gif,
@@ -2268,8 +2269,27 @@ body.view-mode .polaroid-badge-tag {
 
 
 /* ==========================================================================
-   PASSCODE LOCK SCREEN & VAULT STYLES
+   PASSCODE LOCK SCREEN & VAULT HARD-LOCK STYLES
    ========================================================================== */
+body.vault-locked main,
+body.vault-locked header,
+body.vault-locked .floating-music-widget,
+body.vault-locked #welcome-screen,
+body.vault-locked .admin-bar,
+body.vault-locked .site-footer {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+body.vault-locked #passcode-lock-screen {
+  display: flex !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  pointer-events: all !important;
+}
+
 .passcode-lock-screen {
   position: fixed;
   top: 0;
