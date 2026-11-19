@@ -1051,11 +1051,11 @@ Always stay the same graceful & awesome soul you are. Happy Birthday! 💖✨`,
       this.opacity = 1;
       this.decay = Math.random() * 0.005 + 0.003;
     }
-    update() {
-      this.y += this.speedY;
-      this.x += this.speedX + Math.sin(this.y * 0.02) * 0.5;
-      this.rotation += this.rotationSpeed;
-      this.opacity -= this.decay;
+    step(dt) {
+      this.y += this.speedY * dt;
+      this.x += (this.speedX + Math.sin(this.y * 0.02) * 0.9) * dt;
+      this.rotation += this.rotationSpeed * dt;
+      this.opacity -= this.decay * dt;
     }
     draw(ctx) {
       ctx.save();
@@ -1099,19 +1099,23 @@ Always stay the same graceful & awesome soul you are. Happy Birthday! 💖✨`,
     }
   }
 
-  function animateParticles() {
-    if (confettiCtx) {
-      confettiCtx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
-      for (let i = backgroundParticles.length - 1; i >= 0; i--) {
-        const p = backgroundParticles[i];
-        p.update();
-        p.draw(confettiCtx);
-        if (p.opacity <= 0 || p.y > window.innerHeight + 50) {
-          backgroundParticles.splice(i, 1);
-        }
+  let lastParticleFrame = performance.now();
+  function animateParticles(now) {
+    requestAnimationFrame(animateParticles);
+    if (!confettiCtx) return;
+    // Time-lagged motion: same soft feel at 60Hz and 120Hz+ screens (no jitter)
+    const dt = Math.min(2, Math.max(0.2, now - lastParticleFrame) / 16.67);
+    lastParticleFrame = now;
+    if (!backgroundParticles.length) return;
+    confettiCtx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
+    for (let i = backgroundParticles.length - 1; i >= 0; i--) {
+      const p = backgroundParticles[i];
+      p.step(dt);
+      p.draw(confettiCtx);
+      if (p.opacity <= 0 || p.y > window.innerHeight + 50 || p.x < -120 || p.x > window.innerWidth + 120) {
+        backgroundParticles.splice(i, 1);
       }
     }
-    requestAnimationFrame(animateParticles);
   }
   requestAnimationFrame(animateParticles);
 
@@ -1165,6 +1169,8 @@ Always stay the same graceful & awesome soul you are. Happy Birthday! 💖✨`,
   }
 
   function animateFireworks() {
+    requestAnimationFrame(animateFireworks);
+    if (!fireworks.length) return;
     if (fireworksCtx) {
       fireworksCtx.clearRect(0, 0, fireworksCanvas.width, fireworksCanvas.height);
       for (let i = fireworks.length - 1; i >= 0; i--) {
@@ -1176,7 +1182,6 @@ Always stay the same graceful & awesome soul you are. Happy Birthday! 💖✨`,
         }
       }
     }
-    requestAnimationFrame(animateFireworks);
   }
   requestAnimationFrame(animateFireworks);
 
@@ -1292,11 +1297,11 @@ Always stay the same graceful & awesome soul you are. Happy Birthday! 💖✨`,
 
       if (newEl) {
         newEl.style.display = 'flex';
-        newEl.classList.remove('page-flip-backward');
+        newEl.classList.remove('page-flip-backward', 'active-page');
         if (!isForward) {
           newEl.classList.add('page-flip-backward');
         }
-        void newEl.offsetWidth; // trigger reflow
+        void newEl.offsetWidth; // trigger reflow so the 3D flip replays every time
         newEl.classList.add('active-page');
       }
 
@@ -1310,10 +1315,10 @@ Always stay the same graceful & awesome soul you are. Happy Birthday! 💖✨`,
         }, 300);
       }
 
+      initScrollReveal();
       setTimeout(() => {
         isTransitioningChapter = false;
-        init3DCardTilt();
-      }, 650);
+      }, 420);
     };
 
     if (prevBtn) {
@@ -1374,19 +1379,77 @@ Always stay the same graceful & awesome soul you are. Happy Birthday! 💖✨`,
       if (card.dataset.tiltBound) return;
       card.dataset.tiltBound = 'true';
 
-      card.addEventListener('mousemove', (e) => {
+      let frame = null;
+      let lastX = 0;
+      let lastY = 0;
+
+      function renderTilt() {
         const rect = card.getBoundingClientRect();
-        const x = e.clientX - rect.left - rect.width / 2;
-        const y = e.clientY - rect.top - rect.height / 2;
-        const rotateX = -(y / (rect.height / 2)) * 10;
-        const rotateY = (x / (rect.width / 2)) * 10;
-        card.style.transform = `perspective(1100px) rotateX(${rotateX.toFixed(2)}deg) rotateY(${rotateY.toFixed(2)}deg) scale3d(1.025, 1.025, 1.025)`;
+      card.addEventListener('pointermove', (e) => {
+        if (e.pointerType === 'touch') return;
+        lastX = e.clientX;
+        lastY = e.clientY;
+        if (frame) return;
+        frame = requestAnimationFrame(() => {
+          frame = null;
+          renderTilt();
+        });
       });
 
-      card.addEventListener('mouseleave', () => {
+      card.addEventListener('pointerleave', () => {
+        if (frame) {
+          cancelAnimationFrame(frame);
+          frame = null;
+        }
+        card.style.transition = 'transform 0.65s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease';
         card.style.transform = '';
       });
     });
+  }
+
+  // SCROLL REVEAL ENGINE
+  // Cards and headers rise in smoothly, one after another (staggered).
+  const revealObserver = (typeof IntersectionObserver !== 'undefined')
+    ? new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          entry.target.classList.add('is-revealed');
+          revealObserver.unobserve(entry.target);
+        });
+      }, { threshold: 0.12, rootMargin: '0px 0px -6% 0px' })
+    : null;
+
+  function initScrollReveal() {
+    if (!revealObserver) return;
+    document.body.classList.add('js-reveal-on');
+    const targets = document.querySelectorAll('.section-header, .polaroid-card, .reason-card, .timeline-card');
+    let order = 0;
+    targets.forEach((el) => {
+      if (el.dataset.revealBound) return;
+      el.dataset.revealBound = 'true';
+      el.classList.add('js-reveal');
+      el.style.setProperty('--reveal-delay', `${(order % 6) * 70}ms`);
+      order++;
+      revealObserver.observe(el);
+    });
+  }
+
+  // BUTTON RIPPLE + PRESS FEEDBACK
+  function initButtonRipples() {
+    document.addEventListener('pointerdown', (e) => {
+      const btn = e.target.closest('button');
+      if (!btn || btn.disabled) return;
+      const rect = btn.getBoundingClientRect();
+      const size = Math.max(rect.width, rect.height) * 1.6;
+      const ripple = document.createElement('span');
+      ripple.className = 'btn-ripple';
+      ripple.style.width = `${size}px`;
+      ripple.style.height = `${size}px`;
+      ripple.style.left = `${e.clientX - rect.left - size / 2}px`;
+      ripple.style.top = `${e.clientY - rect.top - size / 2}px`;
+      btn.appendChild(ripple);
+      setTimeout(() => ripple.remove(), 620);
+    }, { passive: true });
   }
 
   // INTERACTIVE CURSOR SPARKLES TRAIL
@@ -1746,6 +1809,8 @@ Always stay the same graceful & awesome soul you are. Happy Birthday! 💖✨`,
 
       grid.appendChild(card);
     });
+    initScrollReveal();
+    init3DCardTilt();
   }
 
   function resizeImageFile(file, maxWidth = 1400, maxHeight = 1400, quality = 0.88) {
@@ -1996,6 +2061,8 @@ Always stay the same graceful & awesome soul you are. Happy Birthday! 💖✨`,
 
       container.appendChild(card);
     });
+    initScrollReveal();
+    init3DCardTilt();
   }
 
   function setupReasonsEditor() {
@@ -2225,6 +2292,8 @@ Always stay the same graceful & awesome soul you are. Happy Birthday! 💖✨`,
 
       container.appendChild(el);
     });
+    initScrollReveal();
+    init3DCardTilt();
   }
 
   function setupTimelineActions() {
@@ -2618,7 +2687,9 @@ Always stay the same graceful & awesome soul you are. Happy Birthday! 💖✨`,
 
     // 3D Storybook & Animation Engines
     initStorybookNavigation();
+    initScrollReveal();
     init3DCardTilt();
+    initButtonRipples();
     initCursorSparkles();
   }
 
