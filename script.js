@@ -1299,13 +1299,20 @@ Always stay the same graceful & awesome soul you are. Happy Birthday! 💖✨`,
       playSparkleSound();
 
       if (oldEl) {
-        oldEl.classList.remove('active-page', 'page-flip-backward');
-        oldEl.style.display = 'none';
+        oldEl.classList.remove('page-flip-backward', 'active-page');
+        oldEl.classList.add('page-flip-out');
+        if (!isForward) {
+          oldEl.classList.add('backward');
+        }
+        setTimeout(() => {
+          oldEl.classList.remove('page-flip-out', 'backward');
+          oldEl.style.display = 'none';
+        }, 440);
       }
 
       if (newEl) {
         newEl.style.display = 'flex';
-        newEl.classList.remove('page-flip-backward', 'active-page');
+        newEl.classList.remove('page-flip-backward', 'active-page', 'page-flip-out', 'backward');
         if (!isForward) {
           newEl.classList.add('page-flip-backward');
         }
@@ -1326,7 +1333,7 @@ Always stay the same graceful & awesome soul you are. Happy Birthday! 💖✨`,
       initScrollReveal();
       setTimeout(() => {
         isTransitioningChapter = false;
-      }, 420);
+      }, 450);
     };
 
     if (prevBtn) {
@@ -2936,18 +2943,20 @@ Always stay the same graceful & awesome soul you are. Happy Birthday! 💖✨`,
 
       setTimeout(() => {
         if (lockScreen) {
+          // Immediately unmask website underneath so it is visible during the 600ms fade-out dissolve
+          document.body.classList.remove('vault-locked');
+          unlockAndInitializeWebsite();
           lockScreen.classList.add('fade-out');
-          setTimeout(async () => {
+
+          setTimeout(() => {
             lockScreen.style.display = 'none';
             lockScreen.classList.remove('fade-out');
-            document.body.classList.remove('vault-locked');
             if (unlockBtn) {
               unlockBtn.innerHTML = '<span>Surprise Unlock Kijiye</span> <span class="unlock-btn-icon">💖</span>';
               unlockBtn.style.background = '';
             }
             if (lockEmoji) lockEmoji.textContent = '🔒';
             if (lockCircle) lockCircle.classList.remove('unlocked-glow');
-            await unlockAndInitializeWebsite();
           }, 600);
         } else {
           document.body.classList.remove('vault-locked');

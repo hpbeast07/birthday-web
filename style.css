@@ -1756,12 +1756,24 @@ body.view-mode .admin-mode-pill {
   margin: 30px auto 0;
   position: relative;
   display: none;
-  animation: unfoldLetter 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  transform-origin: top center;
+  will-change: transform, opacity;
+  animation: unfoldLetter 0.72s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 
 @keyframes unfoldLetter {
-  0% { transform: translateY(30px) scale(0.92); opacity: 0; }
-  100% { transform: translateY(0) scale(1); opacity: 1; }
+  0% {
+    transform: perspective(1000px) rotateX(-14deg) translateY(28px) scale(0.94);
+    opacity: 0;
+  }
+  65% {
+    transform: perspective(1000px) rotateX(2deg) translateY(-2px) scale(1.005);
+    opacity: 1;
+  }
+  100% {
+    transform: perspective(1000px) rotateX(0deg) translateY(0) scale(1);
+    opacity: 1;
+  }
 }
 
 .opened-letter-sheet.active {
@@ -2876,22 +2888,42 @@ body.vault-locked #passcode-lock-screen {
   align-items: center;
   justify-content: center;
   opacity: 1 !important;
-  animation: page3DInForward 0.72s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation: page3DInForward 0.52s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 .storybook-page.page-flip-backward {
-  animation: page3DInBackward 0.72s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation: page3DInBackward 0.52s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
-/* Ease-out with smooth spring feel (no stutter, GPU-accelerated) */
+/* Outgoing page during chapter transition */
+.storybook-page.page-flip-out {
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  margin: 0 auto !important;
+  pointer-events: none !important;
+  z-index: 1 !important;
+  display: flex !important;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  animation: page3DOutForward 0.44s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.storybook-page.page-flip-out.backward {
+  animation: page3DOutBackward 0.44s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+/* In Forward: enters from right with gentle turn */
 @keyframes page3DInForward {
   0% {
     opacity: 0;
-    transform: perspective(1400px) rotateY(-12deg) scale(0.95) translate3d(45px, 0, 0);
+    transform: perspective(1400px) rotateY(-10deg) scale(0.96) translate3d(45px, 0, 0);
   }
   68% {
     opacity: 1;
-    transform: perspective(1400px) rotateY(1deg) scale(1.002) translate3d(-3px, 0, 0);
+    transform: perspective(1400px) rotateY(0.8deg) scale(1.002) translate3d(-2px, 0, 0);
   }
   100% {
     opacity: 1;
@@ -2899,18 +2931,43 @@ body.vault-locked #passcode-lock-screen {
   }
 }
 
+/* In Backward: enters from left with gentle turn */
 @keyframes page3DInBackward {
   0% {
     opacity: 0;
-    transform: perspective(1400px) rotateY(12deg) scale(0.95) translate3d(-45px, 0, 0);
+    transform: perspective(1400px) rotateY(10deg) scale(0.96) translate3d(-45px, 0, 0);
   }
   68% {
     opacity: 1;
-    transform: perspective(1400px) rotateY(-1deg) scale(1.002) translate3d(3px, 0, 0);
+    transform: perspective(1400px) rotateY(-0.8deg) scale(1.002) translate3d(2px, 0, 0);
   }
   100% {
     opacity: 1;
     transform: perspective(1400px) rotateY(0deg) scale(1) translate3d(0, 0, 0);
+  }
+}
+
+/* Out Forward: exits to left with gentle turn */
+@keyframes page3DOutForward {
+  0% {
+    opacity: 1;
+    transform: perspective(1400px) rotateY(0deg) scale(1) translate3d(0, 0, 0);
+  }
+  100% {
+    opacity: 0;
+    transform: perspective(1400px) rotateY(10deg) scale(0.96) translate3d(-45px, 0, 0);
+  }
+}
+
+/* Out Backward: exits to right with gentle turn */
+@keyframes page3DOutBackward {
+  0% {
+    opacity: 1;
+    transform: perspective(1400px) rotateY(0deg) scale(1) translate3d(0, 0, 0);
+  }
+  100% {
+    opacity: 0;
+    transform: perspective(1400px) rotateY(-10deg) scale(0.96) translate3d(45px, 0, 0);
   }
 }
 
