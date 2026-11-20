@@ -2883,40 +2883,34 @@ body.vault-locked #passcode-lock-screen {
   animation: page3DInBackward 0.72s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
-/* Ease-out with a tiny spring overshoot at the end (no bounce at the start!) */
+/* Ease-out with smooth spring feel (no stutter, GPU-accelerated) */
 @keyframes page3DInForward {
   0% {
     opacity: 0;
-    transform: perspective(1600px) rotateY(-14deg) scale(0.94) translateX(64px);
-    filter: blur(6px);
+    transform: perspective(1400px) rotateY(-12deg) scale(0.95) translate3d(45px, 0, 0);
   }
-  62% {
+  68% {
     opacity: 1;
-    transform: perspective(1600px) rotateY(1.4deg) scale(1.004) translateX(-5px);
-    filter: blur(0);
+    transform: perspective(1400px) rotateY(1deg) scale(1.002) translate3d(-3px, 0, 0);
   }
   100% {
     opacity: 1;
-    transform: perspective(1600px) rotateY(0deg) scale(1) translateX(0);
-    filter: blur(0);
+    transform: perspective(1400px) rotateY(0deg) scale(1) translate3d(0, 0, 0);
   }
 }
 
 @keyframes page3DInBackward {
   0% {
     opacity: 0;
-    transform: perspective(1600px) rotateY(14deg) scale(0.94) translateX(-64px);
-    filter: blur(6px);
+    transform: perspective(1400px) rotateY(12deg) scale(0.95) translate3d(-45px, 0, 0);
   }
-  62% {
+  68% {
     opacity: 1;
-    transform: perspective(1600px) rotateY(-1.4deg) scale(1.004) translateX(5px);
-    filter: blur(0);
+    transform: perspective(1400px) rotateY(-1deg) scale(1.002) translate3d(3px, 0, 0);
   }
   100% {
     opacity: 1;
-    transform: perspective(1600px) rotateY(0deg) scale(1) translateX(0);
-    filter: blur(0);
+    transform: perspective(1400px) rotateY(0deg) scale(1) translate3d(0, 0, 0);
   }
 }
 
@@ -2962,7 +2956,9 @@ body.vault-locked #passcode-lock-screen {
 .card-3d-tilt {
   transform-style: preserve-3d;
   will-change: transform;
-  transition: transform 0.16s cubic-bezier(0.2, 0, 0, 1), box-shadow 0.25s ease;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  transition: box-shadow 0.28s ease, border-color 0.25s ease;
   position: relative;
 }
 

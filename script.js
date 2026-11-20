@@ -1134,11 +1134,11 @@ Always stay the same graceful & awesome soul you are. Happy Birthday! 💖✨`,
       this.gravity = 0.08;
       this.radius = Math.random() * 3 + 1.5;
     }
-    update() {
-      this.vy += this.gravity;
-      this.x += this.vx;
-      this.y += this.vy;
-      this.alpha -= this.decay;
+    update(dt = 1) {
+      this.vy += this.gravity * dt;
+      this.x += this.vx * dt;
+      this.y += this.vy * dt;
+      this.alpha -= this.decay * dt;
     }
     draw(ctx) {
       ctx.save();
@@ -1168,14 +1168,22 @@ Always stay the same graceful & awesome soul you are. Happy Birthday! 💖✨`,
     }
   }
 
-  function animateFireworks() {
+  let lastFireworkFrame = performance.now();
+  function animateFireworks(now) {
     requestAnimationFrame(animateFireworks);
-    if (!fireworks.length) return;
+    if (!fireworks.length) {
+      if (fireworksCtx && fireworksCanvas) {
+        fireworksCtx.clearRect(0, 0, fireworksCanvas.width, fireworksCanvas.height);
+      }
+      return;
+    }
+    const dt = Math.min(2, Math.max(0.2, (now - lastFireworkFrame) / 16.67));
+    lastFireworkFrame = now;
     if (fireworksCtx) {
       fireworksCtx.clearRect(0, 0, fireworksCanvas.width, fireworksCanvas.height);
       for (let i = fireworks.length - 1; i >= 0; i--) {
         const fp = fireworks[i];
-        fp.update();
+        fp.update(dt);
         fp.draw(fireworksCtx);
         if (fp.alpha <= 0) {
           fireworks.splice(i, 1);
@@ -1372,7 +1380,7 @@ Always stay the same graceful & awesome soul you are. Happy Birthday! 💖✨`,
     updateNavigatorUI();
   }
 
-  // 3D CARD PARALLAX TILT ENGINE
+  // 3D CARD PARALLAX TILT ENGINE (Silky smooth lerp damping)
   function init3DCardTilt() {
     const cards = document.querySelectorAll('.card-3d-tilt, .polaroid-card, .reason-card');
     cards.forEach(card => {
@@ -1380,35 +1388,58 @@ Always stay the same graceful & awesome soul you are. Happy Birthday! 💖✨`,
       card.dataset.tiltBound = 'true';
 
       let frame = null;
-      let lastX = 0;
-      let lastY = 0;
+      let targetRotX = 0;
+      let targetRotY = 0;
+      let currRotX = 0;
+      let currRotY = 0;
+      let isHovered = false;
 
-      function renderTilt() {
-        const rect = card.getBoundingClientRect();
-        const x = lastX - rect.left - rect.width / 2;
-        const y = lastY - rect.top - rect.height / 2;
-        const rotateX = -(y / (rect.height / 2)) * 10;
-        const rotateY = (x / (rect.width / 2)) * 10;
-        card.style.transform = `perspective(1100px) rotateX(${rotateX.toFixed(2)}deg) rotateY(${rotateY.toFixed(2)}deg) scale3d(1.025, 1.025, 1.025)`;
+      function updateTilt() {
+        if (!isHovered) return;
+        // Smooth lerp damping (0.14 factor)
+        currRotX += (targetRotX - currRotX) * 0.14;
+        currRotY += (targetRotY - currRotY) * 0.14;
+
+        card.style.transform = `perspective(1100px) rotateX(${currRotX.toFixed(2)}deg) rotateY(${currRotY.toFixed(2)}deg) scale3d(1.025, 1.025, 1.025)`;
+
+        if (Math.abs(targetRotX - currRotX) > 0.04 || Math.abs(targetRotY - currRotY) > 0.04) {
+          frame = requestAnimationFrame(updateTilt);
+        } else {
+          frame = null;
+        }
       }
+
+      card.addEventListener('pointerenter', (e) => {
+        if (e.pointerType === 'touch') return;
+        isHovered = true;
+        card.style.transition = 'box-shadow 0.3s ease';
+      });
 
       card.addEventListener('pointermove', (e) => {
         if (e.pointerType === 'touch') return;
-        lastX = e.clientX;
-        lastY = e.clientY;
-        if (frame) return;
-        frame = requestAnimationFrame(() => {
-          frame = null;
-          renderTilt();
-        });
+        isHovered = true;
+        const rect = card.getBoundingClientRect();
+        const x = e.clientX - rect.left - rect.width / 2;
+        const y = e.clientY - rect.top - rect.height / 2;
+        targetRotX = -(y / (rect.height / 2)) * 10;
+        targetRotY = (x / (rect.width / 2)) * 10;
+
+        if (!frame) {
+          frame = requestAnimationFrame(updateTilt);
+        }
       });
 
       card.addEventListener('pointerleave', () => {
+        isHovered = false;
         if (frame) {
           cancelAnimationFrame(frame);
           frame = null;
         }
-        card.style.transition = 'transform 0.65s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease';
+        targetRotX = 0;
+        targetRotY = 0;
+        currRotX = 0;
+        currRotY = 0;
+        card.style.transition = 'transform 0.65s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.3s ease';
         card.style.transform = '';
       });
     });
